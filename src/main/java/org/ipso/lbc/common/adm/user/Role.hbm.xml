@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+  ~ 版权所有 (c) 2015 。 李倍存 （iPso）。
+  ~ 所有者对该文件所包含的代码的正确性、执行效率等任何方面不作任何保证。
+  ~ 所有个人和组织均可不受约束地将该文件所包含的代码用于非商业用途。若需要将其用于商业软件的开发，请首先联系所有者以取得许可。
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.ipso.lbc.common.adm.user.Role" table="roles">
+        <id name="name" column="name"/>
+        <property name="description" column="description"/>
+        <set name="permissions" table="roles_permissions" cascade="all">
+            <key  column="role_name" foreign-key="name"></key>
+            <element type="java.lang.String" column="permission"></element>
+        </set>
+    </class>
+</hibernate-mapping>
