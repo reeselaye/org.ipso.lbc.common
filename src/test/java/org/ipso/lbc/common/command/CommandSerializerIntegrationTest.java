@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class CommandSerializerTest {
+public class CommandSerializerIntegrationTest {
 
     @Test
     public void testGetAllSerializedCommands() throws Exception {

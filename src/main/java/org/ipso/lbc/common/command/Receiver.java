@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 信息：李倍存 创建于 2015/7/8 12:06。电邮 1174751315@qq.com。<br>
  * 说明：
  */
-public abstract class Receiver implements Serializable{
+public abstract class Receiver implements Serializable,IReceiver{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -24,7 +24,9 @@ public abstract class Receiver implements Serializable{
 
         return true;
     }
-
+    public Object info(){
+        return this.toString();
+    }
     @Override
     public int hashCode() {
         return (logEnable ? 1 : 0);
@@ -35,7 +37,7 @@ public abstract class Receiver implements Serializable{
     public void setLogEnable(boolean logEnable) {
         this.logEnable = logEnable;
     }
-    public abstract Object  action(Object params);
+
 
     public Object[]         getParams(){
         return new Object[]{0};

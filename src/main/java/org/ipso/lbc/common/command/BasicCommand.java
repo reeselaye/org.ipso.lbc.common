@@ -6,14 +6,16 @@
 
 package org.ipso.lbc.common.command;
 
+import org.ipso.lbc.common.frameworks.logging.LoggingFacade;
+
 import java.io.Serializable;
 
 /**
  * 信息：李倍存 创建于 2015/7/8 12:05。电邮 1174751315@qq.com。<br>
  * 说明：
  */
-public class BasicCommand implements Serializable {
-    protected Receiver              receiver;
+public class BasicCommand implements Serializable,ICommand {
+    protected IReceiver              receiver;
     protected ICommandPreHandler    preHandler;
     protected ICommandPostHandler   postHandler;
     private   Integer               flag = 0;
@@ -21,6 +23,8 @@ public class BasicCommand implements Serializable {
         return "{" + this.hashCode() + "," + getInfo() + "," + getStringParams() + "}";
     }
 
+    public BasicCommand() {
+    }
 
     public Integer getFlag() {
         return flag;
@@ -29,19 +33,19 @@ public class BasicCommand implements Serializable {
         this.flag = flag;
     }
 
-    public              BasicCommand(Receiver receiver) {
+    public              BasicCommand(IReceiver receiver) {
         this(receiver, null, null);
 
     }
-    public              BasicCommand(Receiver receiver, ICommandPreHandler preHandler, ICommandPostHandler postHandler){
+    public              BasicCommand(IReceiver receiver, ICommandPreHandler preHandler, ICommandPostHandler postHandler){
         setReceiver(receiver);
         setPreHandler(preHandler);
         setPostHandler(postHandler);
     }
-    public              BasicCommand(Receiver receiver, ICommandPreHandler preHandler){
+    public              BasicCommand(IReceiver receiver, ICommandPreHandler preHandler){
         this(receiver, preHandler, null);
     }
-    public              BasicCommand(Receiver receiver, ICommandPostHandler postHandler){
+    public              BasicCommand(IReceiver receiver, ICommandPostHandler postHandler){
         this(receiver, null, postHandler);
     }
 
@@ -51,11 +55,11 @@ public class BasicCommand implements Serializable {
     public void         setPreHandler(ICommandPreHandler preHandler) {
         this.preHandler = preHandler;
     }
-    public void         setReceiver(Receiver receiver){
+    public void         setReceiver(IReceiver receiver){
         this.receiver=receiver;
     }
 
-    public Receiver     getReceiver() {
+    public IReceiver     getReceiver() {
         return receiver;
     }
     public Object[]     getParams(){
@@ -69,11 +73,18 @@ public class BasicCommand implements Serializable {
         return params[index];
     }
     public String       getInfo(){
-        return receiver.getClassName();
+        return receiver.getClass().getSimpleName();
     }
 
 
+    protected String msgIfReceiverNull(){
+        return  "Receiver of " + this.toString() + " is NULL.";
+    }
     public Object       exec(Object param){
+        if (receiver == null){
+            LoggingFacade.warn(msgIfReceiverNull());
+            return null;
+        }
         preHandler.handle(this);
         Object o = receiver.action(param);
         postHandler.handle(this);

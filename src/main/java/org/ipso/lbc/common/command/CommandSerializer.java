@@ -8,7 +8,7 @@ package org.ipso.lbc.common.command;
 
 import org.ipso.lbc.common.exception.AppUnCheckException;
 import org.ipso.lbc.common.resource.CommonPaths;
-import org.ipso.lbc.common.utils.file.FileSystemUtils;
+import org.ipso.lbc.common.utils.file.FileSystemAndResourceUtils;
 
 import java.io.*;
 import java.util.Date;
@@ -22,7 +22,7 @@ import static org.ipso.lbc.common.frameworks.logging.LoggingFacade.warn;
  */
 public class CommandSerializer {
     private boolean needUpdate = true;
-    private String workingDir = CommonPaths.WEB_CONTENT_CACHES();
+    private String workingDir = CommonPaths.getContextCache();
     public static CommandSerializer INSTANCE = new CommandSerializer();
     private static Date lastErrorTime = new Date();
 
@@ -34,7 +34,7 @@ public class CommandSerializer {
     public List<BasicCommand> getAllSerializedCommands(){
         if (needUpdate){
             commands.clear();
-            List<File> files = FileSystemUtils.getAllFilesIn(workingDir);
+            List<File> files = FileSystemAndResourceUtils.getAllFilesIn(workingDir);
             for (int i = 0; i < files.size(); i++) {
                 File file = files.get(i);
                 try {
@@ -61,7 +61,7 @@ public class CommandSerializer {
 
     }
     public void delete(BasicCommand command){
-        List<File> files = FileSystemUtils.getAllFilesIn(workingDir);
+        List<File> files = FileSystemAndResourceUtils.getAllFilesIn(workingDir);
         for (int i = 0; i < files.size(); i++) {
             File f = files.get(i);
             try {
