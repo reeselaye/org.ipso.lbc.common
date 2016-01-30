@@ -6,7 +6,6 @@ import org.apache.logging.log4j.core.config.plugins.*;
 import org.apache.logging.log4j.core.layout.AbstractStringLayout;
 import org.apache.logging.log4j.core.util.Constants;
 import org.apache.logging.log4j.core.util.Transform;
-import org.ipso.lbc.common.resource.CommonPaths;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -26,11 +25,10 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
     private static final int BUF_SIZE = 256;
     private static final String TRACE_PREFIX = "<br />&nbsp;&nbsp;&nbsp;&nbsp;";
     private static final String REGEXP = Constants.LINE_SEPARATOR.equals("\n") ? "\n" : Constants.LINE_SEPARATOR + "|\n";
-    private static final String DEFAULT_TITLE = "Log4j Log Messages";
     private static final String DEFAULT_CONTENT_TYPE = "text/html";
     public static final String DEFAULT_FONT_FAMILY = "arial,sans-serif";
 
-    private static final String ICONS_DIR = CommonPaths.WEB_CONTENT_ROOT()+"ICONS/";
+    private static final String ICONS_DIR = "icon/";
     private static final String EMPTY_TD = "";//"<td align=\"center\">N/A</td>";
     private static final String EMPTY_TH = "";//"<th align=\"center\">N/A</th>";
 
@@ -361,7 +359,7 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
             @PluginAttribute(value = "doNotShowWholeLoggerName", defaultBoolean = false) final boolean doNotShowWholeLoggerName,
             @PluginAttribute(value = "useLevelImage", defaultBoolean = false) final boolean useLevelImage,
             @PluginAttribute(value = "maxMessageLength", defaultInt = 0) final int maxMessageLength,
-            @PluginAttribute(value = "title", defaultString = DEFAULT_TITLE) final String title,
+            @PluginAttribute(value = "title", defaultString = "Log messages powered by Log4j2") final String title,
             @PluginAttribute("contentType") String contentType,
             @PluginAttribute(value = "charset", defaultString = "UTF-8") final Charset charset,
             @PluginAttribute("fontSize") String fontSize,
@@ -406,7 +404,7 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
         private boolean doNotShowLevel = false;
 
         @PluginBuilderAttribute
-        private String title = DEFAULT_TITLE;
+        private String title = "";
 
         @PluginBuilderAttribute
         private String contentType = null; // defer default value in order to use specified charset

@@ -38,7 +38,7 @@ public class UserErrorReportViewer extends ActionSupport {
     public String execute() throws Exception {
         try {
             warning = "OK";
-            errorReports = LoggingReader.getLines(CommonPaths.WEB_CONTENT_LOG_ROOT()+"lpu_warn.log");
+            errorReports = LoggingReader.getLines(CommonPaths.getContextLog()+"lpu_warn.log");
             if (errorReports == null || errorReports.length == 0){
                 errorReports = new String[]{};
             }

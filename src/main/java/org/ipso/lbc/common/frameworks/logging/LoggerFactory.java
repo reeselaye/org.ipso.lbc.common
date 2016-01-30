@@ -27,7 +27,7 @@ public class LoggerFactory {
     public static void ConfigureLog4j(){
         /*配置log4j。*/
 //        log4j.logs系统变量在log.properties文件被引用。
-        System.setProperty("log4j.logs", CommonPaths.WEB_CONTENT_LOG_ROOT());
+        System.setProperty("log4j.logs", CommonPaths.getContextLog());
         System.setProperty("log4j.directory", System.getProperty("log4j.logs"));
         try {
 

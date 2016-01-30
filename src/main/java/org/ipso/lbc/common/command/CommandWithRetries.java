@@ -15,9 +15,18 @@ import static org.ipso.lbc.common.frameworks.logging.LoggingFacade.*;
  * 说明：
  */
 public class CommandWithRetries extends BasicCommand {
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
+    }
+
+    public CommandWithRetries() {
+    }
+
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
+
         if (!(o instanceof CommandWithRetries)) return false;
         if (!super.equals(o)) return false;
 
@@ -49,25 +58,25 @@ public class CommandWithRetries extends BasicCommand {
         this.promptMessage = promptMessage;
     }
 
-    public CommandWithRetries(Receiver receiver, Integer retryCount, String promptMessage) {
+    public CommandWithRetries(IReceiver receiver, Integer retryCount, String promptMessage) {
         super(receiver);
         this.promptMessage = promptMessage;
         this.retryCount = retryCount;
     }
 
-    public CommandWithRetries(Receiver receiver, ICommandPostHandler postHandler, Integer retryCount,  String promptMessage) {
+    public CommandWithRetries(IReceiver receiver, ICommandPostHandler postHandler, Integer retryCount,  String promptMessage) {
         super(receiver, postHandler);
         this.promptMessage = promptMessage;
         this.retryCount = retryCount;
     }
 
-    public CommandWithRetries(Receiver receiver, ICommandPreHandler preHandler, Integer retryCount,  String promptMessage) {
+    public CommandWithRetries(IReceiver receiver, ICommandPreHandler preHandler, Integer retryCount,  String promptMessage) {
         super(receiver, preHandler);
         this.promptMessage = promptMessage;
         this.retryCount = retryCount;
     }
 
-    public CommandWithRetries(Receiver receiver, ICommandPreHandler preHandler, ICommandPostHandler postHandler, Integer retryCount, String promptMessage) {
+    public CommandWithRetries(IReceiver receiver, ICommandPreHandler preHandler, ICommandPostHandler postHandler, Integer retryCount, String promptMessage) {
         super(receiver, preHandler, postHandler);
         this.promptMessage = promptMessage;
         this.retryCount = retryCount;
@@ -95,20 +104,22 @@ public class CommandWithRetries extends BasicCommand {
         if (preHandler != null){
             preHandler.handle(this);
         }
-        Exception failException = null ;
-        String mission = (ObjectUtils.getHash4(this) + promptMessage );
-        debug("Mission {" + mission + "} starting.");
+        Exception failException;
+        String command = (ObjectUtils.getHash4(this) + promptMessage + " with receiver info{" + receiver.info()+ "}" );
+        debug("Command {" + command + "} starting.");
         do {
+            failException = null;
             try {
                 o = once(receiver,params);
             } catch (Exception e) {
                 failException = e;
             }
             if (failException != null) {
+                debug("Command {" + command + "} failed on "+failTimes+" retry.");
                 failTimes++;
             }
             else {
-                info("Mission {" + mission + "} success.");
+                info("Command {" + command + "} success.");
                 break;
             }
 
@@ -116,14 +127,10 @@ public class CommandWithRetries extends BasicCommand {
 
         if(isFinallyFailed()){
             // logging
-            if (failException != null && postHandler!= null){//due to exception and there's handler
-                warn(mission + "is finally failed due to{" + failException.getMessage() + "}, but there's a post handler{" +postHandler.toString() +  "} which might deal with it.");
-            } else if (failException != null && postHandler == null){
-                error(mission + "is finally failed, and no handler is configured.", failException);
-            } else if (failException == null && postHandler != null){
-                warn(mission + " is finally failed because {" + reason() + "}, but there's a post handler{" +postHandler.toString() +  "} which might deal with it.");
-            } else if (failException ==null && postHandler == null){
-                warn(mission + " is finally failed because {" + reason() + "}, and no handler is configured.");
+            if (postHandler!= null){//due to exception and there's handler
+                error(command + "is finally failed, but there's a post handler{" +postHandler.toString() +  "} which might deal with it.", failException);
+            } else {
+                error(command + "is finally failed, and no handler is configured.", failException);
             }
         }
 
@@ -139,7 +146,11 @@ public class CommandWithRetries extends BasicCommand {
     protected Object    reason(){
         return (retryCount>0?"there are " + retryCount + " retries failed.":"no retry is configured.");
     }
-    protected Object    once(Receiver receiver,Object params){
+    protected Object    once(IReceiver receiver,Object params){
+        if (receiver == null){
+            warn(msgIfReceiverNull());
+            return null;
+        }
         return receiver.action(params);
     }
 

@@ -7,6 +7,7 @@
 package org.ipso.lbc.common.frameworks.ucanaccess;
 
 import net.ucanaccess.jdbc.UcanaccessDataSource;
+import org.ipso.lbc.common.resource.CommonPaths;
 import org.ipso.lbc.common.utils.ResourcePathHelper;
 
 /**
@@ -17,12 +18,26 @@ public class MyDataSource extends UcanaccessDataSource{
     public MyDataSource() {
     }
 
+
+    private String accessName;
+
+    public String getAccessName() {
+        return accessName;
+    }
+
+    public void setAccessName(String accessName) {
+        this.accessName = accessName;
+        setAccessPath(CommonPaths.getContextData() + accessName);
+    }
+
     @Override
     public void setAccessPath(String accessPath) {
         String realpath=accessPath;
-        if (accessPath.substring(0,10).equals("classpath:")){
+        if (accessPath.length() >10 && accessPath.substring(0,10).equals("classpath:")){
             String classPath= ResourcePathHelper.getAbsolutePath("");
             realpath=classPath+accessPath.substring(10);
+        } else if (accessPath.length()>5 && accessPath.substring(0,5).equals("data:")){
+            realpath = CommonPaths.getContextData()+accessPath.substring(5);
         }
 
         super.setAccessPath(realpath);

@@ -6,9 +6,9 @@
 
 package org.ipso.lbc.common.domain.dao;
 
+import org.ipso.lbc.common.adm.user.Role;
 import org.ipso.lbc.common.db.dao.AbstractDAO;
 import org.ipso.lbc.common.db.dao.SuperDAO;
-import org.ipso.lbc.common.adm.user.Role;
 
 /**
  * 李倍存 创建于 2015-05-09 20:34。电邮 1174751315@qq.com。

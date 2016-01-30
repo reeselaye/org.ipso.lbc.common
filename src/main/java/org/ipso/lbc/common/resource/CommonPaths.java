@@ -7,27 +7,59 @@
 
 package org.ipso.lbc.common.resource;
 
+import org.ipso.lbc.common.config.Configuration;
+import org.ipso.lbc.common.exception.NotImplementedException;
+import org.ipso.lbc.common.frameworks.logging.LoggingFacade;
 import org.ipso.lbc.common.utils.ResourcePathHelper;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 /**
  * Created by LBC on 2015/2/11.
  */
 public class CommonPaths {
-    public static String ROOT="";
-
-
-
-    public static  String WEB_CONTENT_ROOT() {
-        return ResourcePathHelper.getAbsolutePath(ROOT);//WEB根目录
+    private static boolean warnWorkingDirNotSet = false;
+    private static boolean infoRoot = false;
+    public static  String getContextRoot() {
+        String root = Configuration.INSTANCE.getConfigurationEnsureReturn("app.context.workingDir");
+        if (root.equals("")){
+            if (!warnWorkingDirNotSet){
+                warnWorkingDirNotSet = true;
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        LoggingFacade.warn("The app.context.workingDir is not correctly set!\nPlease check the .properties files.");
+                    }
+                },5000);
+            }
+        }
+        if (root.matches("[a-zA-Z]:(.*)")) {//so it is a absolute path.
+            return root;
+        }
+        if (root.startsWith("classpath:")) {// so it is given depends on the classpath.
+            throw new NotImplementedException("We are sorry that this feature is not supported yet.");
+        }
+        //consider it as a relative path.
+        final String t = ResourcePathHelper.getAbsolutePath(root);
+        if (!infoRoot){
+            infoRoot = true;
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    LoggingFacade.info("The working directory root is set to: " + t);
+                }
+            },5000);
+        }
+        return t;
     }
-    public static  String WEB_CONTENT_LOG_ROOT(){return WEB_CONTENT_ROOT() + "LOG/";}
-    private static String WEB_CONTENT_NAME(){return WEB_CONTENT_ROOT().substring(WEB_CONTENT_ROOT().substring(WEB_CONTENT_ROOT().length() - 1).lastIndexOf("/") + 1);}
-    public static  String WEB_CONTENT_CACHES(){return WEB_CONTENT_ROOT() + "CACHES/";}//WEB的CACHES目录，用于保存缓存记录
-    public static  String WEB_CONTENT_TEMP(){return ResourcePathHelper.getAbsolutePath(ROOT+"../../TEMP/");}//WEB的TEMP目录，用于缓存数据或者其他
-    public static  String WEB_CONTENT_CONFIG(){return WEB_CONTENT_ROOT() + "CONFIG/";}//WEB的CONFIG目录，用于保存配置文件
-    public static  String WEB_CONTENT_DATA(){
-        return WEB_CONTENT_ROOT() + "DATA/";}//WEB的DATA目录，用于保存数据库相关文件
-    public static String WEB_RELATIVE_PATH_OF(String content) {
-        return WEB_CONTENT_NAME() + content;
+    public static  String getContextLog(){return getContextRoot() + "log/";}
+    public static  String getContextCache(){
+        return getContextRoot() + "cache/";
     }
+    public static  String getContextTemp(){return getContextRoot() + "temp/";}
+    public static  String getContextConfig(){return getContextRoot() + "config/";}
+    public static  String getContextData(){return getContextRoot() + "data/";}
+
 }

@@ -33,7 +33,7 @@ public class LogMailingUtils {
             helper.setFrom(from);
             helper.setSubject(subjectPrefix + "  " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
-            String dir= ResourcePathHelper.getAbsolutePath("../../../../logs/");
+            String dir= ResourcePathHelper.getAbsolutePath("../../../../log/");
             FileSystemResource err = new FileSystemResource(new File(dir+"lpu_error.log"));
             FileSystemResource inf = new FileSystemResource(new File(dir+"lpu_info.log"));
 

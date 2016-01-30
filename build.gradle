@@ -6,25 +6,55 @@
 
 apply plugin:'java'
 apply plugin:'maven-publish'
-
     compileJava.options.encoding  = 'UTF-8'
     compileTestJava.options.encoding  = 'UTF-8'
     repositories{
-        mavenLocal()
+        maven{
+            url "F:/Cloud/360Yunpan/Portable/Maven/apache-mave-3.1.1/repo"
+        }
         maven  {
             url "http://repo1.maven.org/maven2"
         }
    }
 
 
+task unittest(type: Test){
+    dependsOn testClasses
+    exclude('**/*IntegrationTest.class')
+}
+test{
+    doFirst{
+        println 'CLASSPATH:'
+        sourceSets.test.runtimeClasspath.each{cp ->
+            println cp
+        }
+    }
+}
+
+task prepareIntegrationTest(type: Copy){
+    from('src/cache'){
+        include '**/*.*'
+    }
+    into('build/idea-out/test/common/cache/')
+}
+test{
+    dependsOn prepareIntegrationTest
+}
+task gatherJars(type:Copy){
+    from configurations.runtime
+    from configurations.testRuntime
+    into 'build/libs-gathered/'
+}
+gatherJars.dependsOn compileJava
+gatherJars.dependsOn compileTestJava
 jar{
     baseName = 'common'
     version = '1.0'
     from('src/main/java/'){
-        include '**/*.*'
+        include '**/*.xml'
+        include '**/*.py'
     }
 }
-
 publishing {
     publications {
         maven(MavenPublication) {
@@ -40,25 +70,26 @@ publishing {
 }
 
 dependencies{
-
-
-        testCompile('junit:junit:4.12')
-        testCompile('org.dbunit:dbunit:2.2'){
-            exclude group:'poi'
-            exclude group:'commons-lang'
-            exclude group:'commons-logging'
-        }
-        compile('org.dbunit:dbunit:2.2'){
-            exclude group:'poi'
-            exclude group:'commons-lang'
-            exclude group:'commons-logging'
-        }
-        testCompile('org.mockito:mockito-core:1.10.19')   
+    testCompile('junit:junit:4.12')
+    testCompile('org.dbunit:dbunit:2.2'){
+        exclude group:'poi'
+        exclude group:'commons-lang'
+        exclude group:'commons-logging'
+    }
+    compile('org.dbunit:dbunit:2.2'){
+        exclude group:'poi'
+        exclude group:'commons-lang'
+        exclude group:'commons-logging'
+    }
+    testCompile('org.mockito:mockito-core:1.10.19')
 
     compile('commons-dbutils:commons-dbutils:1.6')
 
     compile('org.apache.shiro:shiro-all:1.2.3')
-   
+       compile('org.apache.struts:struts2-core:2.3.20'){
+        exclude group:'javassist'
+        exclude group:'org.ow2.asm'
+    }
     compile('org.apache.struts:struts2-json-plugin:2.3.20')
     compile('org.apache.struts:struts2-jfreechart-plugin:2.3.20')
 

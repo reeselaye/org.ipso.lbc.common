@@ -6,6 +6,8 @@
 
 package org.ipso.lbc.common.command;
 
+import org.ipso.lbc.common.frameworks.logging.LoggingFacade;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,15 +16,20 @@ import java.util.List;
  * 说明：
  */
 public  class QueuedInvoker {
-    protected List<BasicCommand> commands=new LinkedList<BasicCommand>();
-    public void addCommand(BasicCommand command){
+    protected List<ICommand> commands=new LinkedList<ICommand>();
+    public void addCommand(ICommand command){
         commands.add(command);
     }
 
     public void batch(){
         Integer size = commands.size();
         for (int i = 0; i < size; i++) {
-            commands.get(i).exec(null);
+            ICommand command = commands.get(i);
+            if (command!= null){
+                command.exec(null);
+            } else {
+                LoggingFacade.warn("There is a NULL command{index:" + i + "} in the queue from " + this.toString());
+            }
         }
         commands.clear();
     }
