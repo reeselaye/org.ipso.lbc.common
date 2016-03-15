@@ -7,6 +7,7 @@
 package org.ipso.lbc.common.frameworks.jfreechart;
 
 import org.ipso.lbc.common.ado.MaxAveMinTuple;
+import org.ipso.lbc.common.command.AbstractReceiver;
 import org.ipso.lbc.common.utils.FileContentUtils;
 import org.ipso.lbc.common.utils.color.MyColor;
 import org.jfree.chart.ChartFactory;
@@ -20,6 +21,7 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.CategoryTableXYDataset;
 
+import javax.print.DocFlavor;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,55 +31,80 @@ import java.util.List;
 
 /**
  * 李倍存 创建于 2015-03-05 17:59。电邮 1174751315@qq.com。
+ * 该类包装了JFreeChart框架的基本使用，约定仅从该类访问JFreeChart而不直接访问。
  */
 public class JFreeChartFacade {
 
-    public JFreeChart createLineChart3D(String title, String categoryLabel, String valueLabel, CategoryDataset ds) {
-        return ChartFactory.createLineChart3D(title, categoryLabel, valueLabel, ds, PlotOrientation.VERTICAL, true, true, true);
-    }
-
     public JFreeChart createLineChart(String title, String categoryLabel, String valueLabel, CategoryDataset ds) {
-        return  createLineChart(title,categoryLabel,valueLabel,null,ds);
+        return  this.createLineChart(title, categoryLabel, valueLabel, null, ds);
     }
 
+    /** create a general LineChart with a given dataset and given lower and upper bounds.
+     * @param title [no details]
+     * @param categoryLabel [no details]
+     * @param valueLabel [no details]
+     * @param bound the given bounds
+     * @param ds the given dataset
+     * @return the created general LineChart
+     */
     public JFreeChart createLineChart(String title, String categoryLabel, String valueLabel, MaxAveMinTuple<Double> bound, CategoryDataset ds){
         JFreeChart chart = ChartFactory.createLineChart(title, categoryLabel, valueLabel, ds, PlotOrientation.VERTICAL, true, true, true);
-        if (!( bound == null||(bound.max.intValue() ==0 && bound.min.intValue() == 0) )){
-            XYPlot xyPlot = chart.getXYPlot();
-            ValueAxis valueAxis = xyPlot.getRangeAxis();
-            valueAxis.setRange(bound.min, bound.max);
-        }
-        return chart;
+        return this.attachBound(chart, bound);
 
     }
 
+    /** create a XYLineChart with a given dataset and lower and upper bounds.
+     * @param title [do details]
+     * @param categoryLabel [no details]
+     * @param valueLabel [no details]
+     * @param bound the given bounds, and the bound.max as upper bound, bound.min as lower bound, the bound.ave is not used in this case
+     * @param ds the given dataset
+     * @return the created chart
+     */
     public JFreeChart createXYLineChart(String title, String categoryLabel, String valueLabel, MaxAveMinTuple<Double> bound, CategoryTableXYDataset ds){
         JFreeChart chart = ChartFactory.createXYLineChart(title,categoryLabel,valueLabel, ds, PlotOrientation.VERTICAL, true, true, true);
+        return this.attachBound(chart, bound);
+
+    }
+
+    /** set lower and upper bounds for a given chart
+     * @param chart the given chart
+     * @param bound the lower and upper bounds
+     * @return the original chart
+     */
+    private JFreeChart attachBound(JFreeChart chart, MaxAveMinTuple<Double> bound){
         if (!( bound == null||(bound.max.intValue() ==0 && bound.min.intValue() == 0) )){
             XYPlot xyPlot = chart.getXYPlot();
             ValueAxis valueAxis = xyPlot.getRangeAxis();
             valueAxis.setRange(bound.min, bound.max);
         }
         return chart;
-
     }
 
-    public DefaultCategoryDataset createDataset(Comparable rowKey, List<Comparable> columnKeys, List<Double> values){
-        DefaultCategoryDataset ds = new DefaultCategoryDataset();
-        Integer size = columnKeys.size();
-        if (size != values.size())
-            throw new IllegalArgumentException("size != values.size()");
-        for (int i = 0; i < size; i++) {
-            ds.addValue(values.get(i), rowKey, columnKeys!=null?(columnKeys.get(i)!=null?columnKeys.get(i):""):"");
-        }
-        return ds;
-    }
-
-    public DefaultCategoryDataset createDataset() {
+    /** create a DefaultCategoryDataset.
+     * @return the created DefaultCategoryDataset
+     */
+    public DefaultCategoryDataset createDefaultCategoryDataset() {
         return new DefaultCategoryDataset();
     }
 
+    /** create a CategoryTableXYDataset.
+     * @return the created CategoryTableXYDataset
+     */
+    public CategoryTableXYDataset createCategoryTableXYDataset(){
+        return new CategoryTableXYDataset();
+    }
 
+
+
+
+    /** save the given chart as a jpg.
+     * @param chart the given chart
+     * @param path the path to save the jpg, it must use a .jpg as extend; if the directory does not exists, it will be created
+     * @param width the width(in pixels) of jpg
+     * @param height the height(in pixels) of jpg
+     * @return the path of the jpg actually saved
+     */
     public String saveAs(JFreeChart chart, String path, Integer width, Integer height) {
         FileOutputStream out = null;
         try {
@@ -122,18 +149,31 @@ public class JFreeChartFacade {
         return path;
     }
 
+    /** save a given chart as a jpg with default size.
+     * @param chart the given chart
+     * @param path the path to save the jpg, it must use a .jpg as extend; if the directory does not exists, it will be created
+     * @return  the path of the jpg actually saved
+     */
     public String saveAs(JFreeChart chart, String path) {
-        return saveAs(chart, path, 1600, 1200);
+        return this.saveAs(chart, path, 1600, 1200);
     }
 
-    public String saveAs(JFreeChart chart, String dir, String filenamePrefix) {
+    /** save a given chart as a jpg with a auto-generated file name.
+     * @param chart the given chart
+     * @param dir the directory to save the jpg; if the directory does not exists, it will be created
+     * @param filenamePrefix the prefix of the auto-generated file name, if you don't need a prefix, pass a ""
+     * @return  the path of the jpg actually saved
+     */
+    public String saveAsAutoFileName(JFreeChart chart, String dir, String filenamePrefix) {
         String path = dir + FileContentUtils.autoFileName(filenamePrefix, ".jpg");
-        return saveAs(chart, path);
+        return this.saveAs(chart, path);
     }
 
-
-
-    public void decorate(JFreeChart chart,Integer seriesNbr){
+    /** decorate a given chart with default theme.
+     * @param chart the given chart
+     * @param seriesNbr how many series of data the given chart has
+     */
+    public JFreeChart decorate(JFreeChart chart,Integer seriesNbr){
         XYPlot xyPlot = chart.getXYPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
 
@@ -175,5 +215,7 @@ public class JFreeChartFacade {
 
         chart.getTitle().setFont(new Font("Arial", Font.BOLD, 20));
         chart.getTitle().setPaint(MyColor.COMMON_FOREGROUND);
+
+        return chart;
     }
 }
