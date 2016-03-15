@@ -6,6 +6,7 @@
 
 package org.ipso.lbc.common.config;
 
+import org.ipso.lbc.common.exception.AppCheckedException;
 import org.ipso.lbc.common.utils.file.FileSystemAndResourceUtils;
 
 import java.io.IOException;
@@ -30,8 +31,6 @@ public class Configuration {
     private List<String> info=new LinkedList<String>(), debug=new LinkedList<String>(), warn=new LinkedList<String>();
 
     private Configuration() {
-
-
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -46,7 +45,7 @@ public class Configuration {
                 }
 
             }
-        }, 5000);
+        }, 1000);
 
 
         properties = new Properties();
@@ -84,7 +83,7 @@ public class Configuration {
     public String getConfigurationEnsureReturn(String name){
         String value = getAllGatheredProperties().getProperty(name);
         if (value==null ||  value.isEmpty()){
-            warn("Attempt to get an empty property{key:" + name +"}, the default value " + DEFAULT_PROPERTY_VALUE +  " is returned.");
+            error("Attempt to get an empty property{key:" + name + "}, the default value " + DEFAULT_PROPERTY_VALUE + " is returned.", new AppCheckedException());
             return DEFAULT_PROPERTY_VALUE;
         }
         return value;

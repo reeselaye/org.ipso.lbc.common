@@ -9,12 +9,10 @@ apply plugin:'maven-publish'
     compileJava.options.encoding  = 'UTF-8'
     compileTestJava.options.encoding  = 'UTF-8'
     repositories{
-        maven{
-            url "F:/Cloud/360Yunpan/Portable/Maven/apache-mave-3.1.1/repo"
-        }
         maven  {
             url "http://repo1.maven.org/maven2"
         }
+        mavenLocal()
    }
 
 

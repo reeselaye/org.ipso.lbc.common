@@ -20,7 +20,8 @@
             <SimplifiedHtmlLayout useLevelImage="true" doNotShowThread="true" doNotShowWholeLoggerName="true"/>
             <Filters>
                 <ThresholdFilter onMatch="NEUTRAL"  onMismatch="DENY" level="info"/>
-                <ThresholdFilter onMatch="DENY"  onMismatch="ACCEPT" level="warn"/>              </Filters>
+                <ThresholdFilter onMatch="DENY"  onMismatch="ACCEPT" level="warn"/>
+            </Filters>
             <Policies>
                 <SizeBasedTriggeringPolicy size="1 MB"/>
             </Policies>
@@ -31,7 +32,8 @@
             <SimplifiedHtmlLayout useLevelImage="true" doNotShowThread="true" doNotShowWholeLoggerName="true"/>
             <Filters>
                 <ThresholdFilter onMatch="NEUTRAL"  onMismatch="DENY" level="info"/>
-                <ThresholdFilter onMatch="DENY"  onMismatch="ACCEPT" level="warn"/>            </Filters>
+                <ThresholdFilter onMatch="DENY"  onMismatch="ACCEPT" level="warn"/>
+            </Filters>
             <Policies>
                 <SizeBasedTriggeringPolicy size="1 MB"/>
             </Policies>
