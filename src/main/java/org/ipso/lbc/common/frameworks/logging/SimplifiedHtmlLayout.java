@@ -6,8 +6,6 @@ import org.apache.logging.log4j.core.config.plugins.*;
 import org.apache.logging.log4j.core.layout.AbstractStringLayout;
 import org.apache.logging.log4j.core.util.Constants;
 import org.apache.logging.log4j.core.util.Transform;
-import org.ipso.lbc.common.config.Configuration;
-import org.ipso.lbc.common.resource.CommonPaths;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -30,7 +28,7 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
     private static final String DEFAULT_CONTENT_TYPE = "text/html";
     public static final String DEFAULT_FONT_FAMILY = "arial,sans-serif";
 
-    private static final String ICONS_DIR = CommonPaths.getContextRoot()+"icon/";
+    private static final String ICONS_DIR = "icon/";
     private static final String EMPTY_TD = "";//"<td align=\"center\">N/A</td>";
     private static final String EMPTY_TH = "";//"<th align=\"center\">N/A</th>";
 

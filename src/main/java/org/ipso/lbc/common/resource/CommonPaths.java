@@ -8,13 +8,13 @@
 package org.ipso.lbc.common.resource;
 
 import org.ipso.lbc.common.config.Configuration;
-import org.ipso.lbc.common.utils.ResourcePathHelper;
 import org.ipso.lbc.common.exception.NotImplementedException;
+import org.ipso.lbc.common.frameworks.logging.LoggingFacade;
+import org.ipso.lbc.common.utils.ResourcePathHelper;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static org.ipso.lbc.common.frameworks.logging.LoggingFacade.*;
 
 /**
  * Created by LBC on 2015/2/11.
@@ -23,16 +23,16 @@ public class CommonPaths {
     private static boolean warnWorkingDirNotSet = false;
     private static boolean infoRoot = false;
     public static  String getContextRoot() {
-        String root = Configuration.INSTANCE.getConfigurationEnsureReturn("app.context.workingDir");
-        if (root.equals("")){
+        final String root = Configuration.INSTANCE.getConfiguration("app.context.workingDir");
+        if (root == null || root.equals("")){
             if (!warnWorkingDirNotSet){
                 warnWorkingDirNotSet = true;
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        System.err.println("The app.context.workingDir is not correctly set!\nPlease check the application.properties file.");
+                        LoggingFacade.warn("The app.context.workingDir is not correctly set{with value:" + (root==null?"NULL":"") +"}!\nPlease check the .properties files.");
                     }
-                },5000);
+                },1000);
             }
         }
         if (root.matches("[a-zA-Z]:(.*)")) {//so it is a absolute path.
@@ -48,14 +48,16 @@ public class CommonPaths {
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    System.out.println("The working directory root is set to: " + t);
+                    LoggingFacade.info("The working directory root is set to: " + t);
                 }
-            },5000);
+            },1000);
         }
         return t;
     }
     public static  String getContextLog(){return getContextRoot() + "log/";}
-    public static  String getContextCache(){return getContextRoot() + "cache/";}
+    public static  String getContextCache(){
+        return getContextRoot() + "cache/";
+    }
     public static  String getContextTemp(){return getContextRoot() + "temp/";}
     public static  String getContextConfig(){return getContextRoot() + "config/";}
     public static  String getContextData(){return getContextRoot() + "data/";}

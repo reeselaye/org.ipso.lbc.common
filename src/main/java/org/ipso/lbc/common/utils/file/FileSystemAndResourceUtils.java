@@ -7,13 +7,12 @@
 package org.ipso.lbc.common.utils.file;
 
 import org.ipso.lbc.common.exception.AppUnCheckException;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,14 +40,16 @@ public class FileSystemAndResourceUtils {
             }
         }
 
-        public static List<InputStream> getAllResources(String url){
-            Enumeration<URL> urls = null;
+        public static List<InputStream> getAllResources(String urlPattern){
+            Resource[] resources;
             List<InputStream> iss = new LinkedList<InputStream>();
             try {
-                urls = FileSystemAndResourceUtils.class.getClassLoader().getResources(url);
-                while (urls.hasMoreElements()){
-                    iss.add(urls.nextElement().openStream());
+                PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+                resources = resolver.getResources(urlPattern);
+                for (Resource r : resources){
+                    iss.add(r.getInputStream());
                 }
+
             } catch (IOException e) {
                 throw new AppUnCheckException(e);
             }

@@ -15,7 +15,7 @@ import java.util.List;
  * 信息：李倍存 创建于 2016/01/08 22:19。电邮 1174751315@qq.com。<br>
  * 说明：
  */
-public abstract class ReceiverPreHandleFailure extends Receiver implements ICommandPreHandler {
+public abstract class AbstractReceiverPreHandleFailure extends AbstractReceiver implements ICommandPreHandler {
 
     @Override
     public boolean equals(Object o) {

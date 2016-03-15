@@ -12,15 +12,15 @@ import java.io.Serializable;
  * 信息：李倍存 创建于 2015/7/8 12:06。电邮 1174751315@qq.com。<br>
  * 说明：
  */
-public abstract class Receiver implements Serializable,IReceiver{
+public abstract class AbstractReceiver implements Serializable,IReceiver{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Receiver)) return false;
+        if (!(o instanceof AbstractReceiver)) return false;
 
-        Receiver receiver = (Receiver) o;
+        AbstractReceiver abstractReceiver = (AbstractReceiver) o;
 
-        if (logEnable != receiver.logEnable) return false;
+        if (logEnable != abstractReceiver.logEnable) return false;
 
         return true;
     }
@@ -50,7 +50,7 @@ public abstract class Receiver implements Serializable,IReceiver{
         return logEnable;
     }
 
-    public static class Default extends Receiver{
+    public static class Default extends AbstractReceiver {
         @Override
         public boolean equals(Object o) {
             return true;

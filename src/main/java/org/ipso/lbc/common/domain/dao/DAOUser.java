@@ -6,11 +6,11 @@
 
 package org.ipso.lbc.common.domain.dao;
 
+import org.ipso.lbc.common.adm.user.User;
+import org.ipso.lbc.common.adm.user.UserUtils;
 import org.ipso.lbc.common.ado.ElementPrintableLinkedList;
 import org.ipso.lbc.common.db.dao.AbstractDAO;
 import org.ipso.lbc.common.db.dao.SuperDAO;
-import org.ipso.lbc.common.adm.user.User;
-import org.ipso.lbc.common.adm.user.UserUtils;
 
 import java.util.List;
 

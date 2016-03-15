@@ -9,14 +9,34 @@ apply plugin:'maven-publish'
     compileJava.options.encoding  = 'UTF-8'
     compileTestJava.options.encoding  = 'UTF-8'
     repositories{
-        mavenLocal()
         maven  {
             url "http://repo1.maven.org/maven2"
         }
+        mavenLocal()
    }
 
-test{
+
+task unittest(type: Test){
+    dependsOn testClasses
     exclude('**/*IntegrationTest.class')
+}
+test{
+    doFirst{
+        println 'CLASSPATH:'
+        sourceSets.test.runtimeClasspath.each{cp ->
+            println cp
+        }
+    }
+}
+
+task prepareIntegrationTest(type: Copy){
+    from('src/cache'){
+        include '**/*.*'
+    }
+    into('build/idea-out/test/common/cache/')
+}
+test{
+    dependsOn prepareIntegrationTest
 }
 task gatherJars(type:Copy){
     from configurations.runtime
@@ -30,7 +50,7 @@ jar{
     version = '1.0'
     from('src/main/java/'){
         include '**/*.xml'
-        include '**.py'
+        include '**/*.py'
     }
 }
 publishing {

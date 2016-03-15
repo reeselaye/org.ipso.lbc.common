@@ -8,21 +8,11 @@ package org.ipso.lbc.common.math.interp;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class LagrangeTest {
 
-    @Test
-    public void testCalc() throws Exception {
-
-    }
-
-    @Test
-    public void testCalc1() throws Exception {
-
-    }
-
-    @Test
+     @Test
     public void testAddPoints() throws Exception {
         Lagrange lagrange = new Lagrange(96);
         lagrange.addPoints(new Double[]{0.25,0.30,0.39,0.45,0.53},new Double[]{0.50,0.5477,0.6245,0.6708,0.7280});

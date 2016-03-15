@@ -9,8 +9,8 @@ package org.ipso.lbc.common.frameworks.logging;
 import org.junit.Test;
 
 import static org.ipso.lbc.common.frameworks.logging.LoggingFacade.*;
-public class LoggingFacadeTest {
-    public LoggingFacadeTest() {
+public class LoggingFacadeIntegrationTest {
+    public LoggingFacadeIntegrationTest() {
         LoggerFactory.ConfigureLog4j();
 
         LoggerFactory.getLogger("fuck").error("TEST" + this.hashCode());

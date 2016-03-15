@@ -60,7 +60,7 @@ public class CommandWithRetries extends BasicCommand {
 
     public CommandWithRetries(IReceiver receiver, Integer retryCount, String promptMessage) {
         super(receiver);
-        this.promptMessage = promptMessage + "with receiver info{" + receiver.info()+ "}";
+        this.promptMessage = promptMessage;
         this.retryCount = retryCount;
     }
 
@@ -104,20 +104,22 @@ public class CommandWithRetries extends BasicCommand {
         if (preHandler != null){
             preHandler.handle(this);
         }
-        Exception failException = null ;
-        String mission = (ObjectUtils.getHash4(this) + promptMessage );
-        debug("Command {" + mission + "} starting.");
+        Exception failException;
+        String command = (ObjectUtils.getHash4(this) + promptMessage + " with receiver info{" + receiver.info()+ "}" );
+        debug("Command {" + command + "} starting.");
         do {
+            failException = null;
             try {
                 o = once(receiver,params);
             } catch (Exception e) {
                 failException = e;
             }
             if (failException != null) {
+                debug("Command {" + command + "} failed on "+failTimes+" retry.");
                 failTimes++;
             }
             else {
-                info("Command {" + mission + "} success.");
+                info("Command {" + command + "} success.");
                 break;
             }
 
@@ -125,14 +127,10 @@ public class CommandWithRetries extends BasicCommand {
 
         if(isFinallyFailed()){
             // logging
-            if (failException != null && postHandler!= null){//due to exception and there's handler
-                error(mission + "is finally failed, but there's a post handler{" +postHandler.toString() +  "} which might deal with it.", failException);
-            } else if (failException != null && postHandler == null){
-                error(mission + "is finally failed, and no handler is configured.", failException);
-            } else if (failException == null && postHandler != null){
-                warn(mission + " is finally failed because {" + reason() + "}, but there's a post handler{" +postHandler.toString() +  "} which might deal with it.");
-            } else if (failException ==null && postHandler == null){
-                warn(mission + " is finally failed because {" + reason() + "}, and no handler is configured.");
+            if (postHandler!= null){//due to exception and there's handler
+                error(command + "is finally failed, but there's a post handler{" +postHandler.toString() +  "} which might deal with it.", failException);
+            } else {
+                error(command + "is finally failed, and no handler is configured.", failException);
             }
         }
 

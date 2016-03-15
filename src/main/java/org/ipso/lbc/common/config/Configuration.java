@@ -6,9 +6,11 @@
 
 package org.ipso.lbc.common.config;
 
+import org.ipso.lbc.common.exception.AppCheckedException;
 import org.ipso.lbc.common.utils.file.FileSystemAndResourceUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static org.ipso.lbc.common.frameworks.logging.LoggingFacade.*;
@@ -16,6 +18,9 @@ import static org.ipso.lbc.common.frameworks.logging.LoggingFacade.*;
 /**
  * 信息：李倍存 创建于 2016/01/15 20:21。电邮 1174751315@qq.com。<br>
  * 说明：
+ */
+/*
+ * Load all .properties files at the root of CLASSPATH, and then attach them to System Properties.
  */
 public class Configuration {
     private static final String DEFAULT_PROPERTY_VALUE = "";
@@ -26,29 +31,6 @@ public class Configuration {
     private List<String> info=new LinkedList<String>(), debug=new LinkedList<String>(), warn=new LinkedList<String>();
 
     private Configuration() {
-        properties = new Properties();
-        List<InputStream> iss = FileSystemAndResourceUtils.getAllResources("application.properties");
-        info.add(iss.size() + " application.properties found, loading all of them ...");
-        for (int i = 0; i < iss.size(); i++) {
-            InputStream is = iss.get(i);
-            try {
-                debug.add("Loading properties from " + is.toString());
-                properties.load(iss.get(i));
-                info.add("Successfully load properties from " + is.toString());
-            } catch (IOException e) {
-                warn.add("Cannot load properties from " + is.toString());
-            }
-        }
-        FileSystemAndResourceUtils.closeAll(iss);
-
-        String kvs="";
-        Object[] keys = properties.stringPropertyNames().toArray();
-        for (int i = 0; i < keys.length; i++) {
-            Object key = keys[i];
-            kvs += key + " - " + properties.getProperty(key.toString()) +"\n";
-        }
-        info.add("The following properties is loaded:\n" + kvs);
-
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -63,18 +45,54 @@ public class Configuration {
                 }
 
             }
-        }, 5000);
+        }, 1000);
+
+
+        properties = new Properties();
+        List<InputStream> iss = FileSystemAndResourceUtils.getAllResources("classpath*:*.properties");
+        if (iss.size() == 0){
+            warn.add("No .properties file is found, which is probably a problem.");
+            return;
+        }
+        info.add(iss.size() + " .properties found, loading all of them ...");
+        for (int i = 0; i < iss.size(); i++) {
+            InputStream is = iss.get(i);
+            try {
+                debug.add("Loading properties from " + is.toString());
+                properties.load(iss.get(i));
+                info.add("Successfully load properties from " + is.toString());
+            } catch (IOException e) {
+                warn.add("Cannot load properties from " + is.toString());
+            }
+        }
+        info.add("Attaching the loaded properties to System Properties ...");
+        System.getProperties().putAll(properties);
+        FileSystemAndResourceUtils.closeAll(iss);
+
+        String kvs="";
+        Object[] keys = getAllGatheredProperties().stringPropertyNames().toArray();
+        for (int i = 0; i < keys.length; i++) {
+            Object key = keys[i];
+            kvs += key + " - " + getAllGatheredProperties().getProperty(key.toString()) +"\n";
+        }
+        debug.add("The following properties is loaded:\n" + kvs);
+
+
     }
 
     public String getConfigurationEnsureReturn(String name){
-        String value = properties.getProperty(name);
-        if (value.isEmpty()){
-            warn("Attempt to get an empty property{key:" + name +"}, the default value " + DEFAULT_PROPERTY_VALUE +  " is returned.");
+        String value = getAllGatheredProperties().getProperty(name);
+        if (value==null ||  value.isEmpty()){
+            error("Attempt to get an empty property{key:" + name + "}, the default value " + DEFAULT_PROPERTY_VALUE + " is returned.", new AppCheckedException());
             return DEFAULT_PROPERTY_VALUE;
         }
         return value;
     }
     public String getConfiguration(String name){
-        return properties.getProperty(name);
+        return getAllGatheredProperties().getProperty(name);
+    }
+
+    private Properties getAllGatheredProperties(){
+        return System.getProperties();
     }
 }

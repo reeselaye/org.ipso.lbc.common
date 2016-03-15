@@ -56,7 +56,7 @@ public class CommandSerializer {
             objectOutputStream.close();
             needUpdate = true;
         } catch (IOException e) {
-            throw new AppUnCheckException("无法保存序列化命令。");
+            throw new AppUnCheckException("无法保存序列化命令。",e);
         }
 
     }
