@@ -38,13 +38,13 @@ task prepareIntegrationTest(type: Copy){
 test{
     dependsOn prepareIntegrationTest
 }
-task gatherJars(type:Copy){
+task runtimeJars(type:Copy){
     from configurations.runtime
     from configurations.testRuntime
     into 'build/libs-gathered/'
+    dependsOn compileJava
+    dependsOn compileTestJava
 }
-gatherJars.dependsOn compileJava
-gatherJars.dependsOn compileTestJava
 jar{
     baseName = 'common'
     version = '1.0'
