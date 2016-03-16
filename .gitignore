@@ -1,2 +1,5 @@
 .gradle/
+ui/
 build/
+gradle-app.setting
+
