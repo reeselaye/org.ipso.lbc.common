@@ -8,35 +8,40 @@ package org.ipso.lbc.common.utils;
 
 import org.junit.Test;
 
+import java.io.File;
+
+import static org.junit.Assert.*;
+
 public class ResourcePathHelperTest {
-
-    @Test
-    public void testGetProperties() throws Exception {
-
-    }
 
     @Test
     public void testGetAbsolutePath() throws Exception {
 
 
-        String path=ResourcePathHelper.getAbsolutePath("");
-        System.out.println(path);
+        File file = new File(ResourcePathHelper.getAbsolutePath("dir/does/not/exists/"));
+        assertEquals(true, file.exists());
 
-        path=ResourcePathHelper.getAbsolutePath("../");
-        System.out.println(path);
+        file = new File(ResourcePathHelper.getAbsolutePath("/file/does/not/exists.tmp"));
 
-        path=ResourcePathHelper.getAbsolutePath("target/../");
-        System.out.println(path);
 
-        path=ResourcePathHelper.getAbsolutePath("../../");
-        System.out.println(path);
+        file = new File(ResourcePathHelper.getAbsolutePath("../../dir/does/not/exists/"));
+        assertEquals(true, file.exists());
 
-        path=ResourcePathHelper.getAbsolutePath("../../test.txt");
-        System.out.println(path);
+        file = new File(ResourcePathHelper.getAbsolutePath("/../../file/does/not/exists.tmp"));
 
 
 
 
+
+    }
+
+    @Test
+    public void testGetClasspath1() throws Exception {
+
+    }
+
+    @Test
+    public void testGetAbsolutePath1() throws Exception {
 
     }
 }
