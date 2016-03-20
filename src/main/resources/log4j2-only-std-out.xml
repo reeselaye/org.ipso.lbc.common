@@ -23,6 +23,7 @@
             <AppenderRef ref="std"/>
         </Logger>
         <Root level="ERROR">
+            <AppenderRef ref="std"/>
         </Root>
     </Loggers>
 </Configuration>
