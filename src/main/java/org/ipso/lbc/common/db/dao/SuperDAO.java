@@ -24,39 +24,24 @@ import java.util.Map;
  *      该类仅可产生数个实例，每一个数据库对应一个{@link SuperDAO}实例。
  */
 public class SuperDAO {
-
-    /**
-     * 实例库。用一个哈希表保存该类的所有实例。
-     */
-    private static Map<String, SuperDAO> instances = new HashMap<String, SuperDAO>();
-    /**
-     * 会话工厂。
-     */
     private SessionFactory sessionFactory;
-    /**
-     * 使用的默认会话。
-     */
     private Session defaultSession;
 
+    public static SuperDAO create(SuperDAOConfiguration configuration){
+        return new SuperDAO(configuration);
+    }
+
+    /** 通过给定配置对象生成SuperDAO实例。
+     * @param configuration 给定配置对象
+     */
+    public SuperDAO(SuperDAOConfiguration configuration) {
+        this(configuration.getConfiguration().buildSessionFactory());
+    }
     /** 通过一个会话工厂构造一个SuperDAO。
      * @param sessionFactory 会话工厂
      */
-    public SuperDAO(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-        this.defaultSession = this.sessionFactory.openSession();
-    }
-
-    /** 通过一个会话构造一个SuperDAO。
-     * @param session 会话
-     */
-    public SuperDAO(Session session){
-        this.defaultSession=session;
-    }
-    public SuperDAO(String configurationFileName, String url){
-        this(new Configuration().configure(configurationFileName).setProperty("hibernate.connection.url", url).buildSessionFactory());
-    }
-    public SuperDAO(String configurationFileName){
-        this(new Configuration().configure(configurationFileName).buildSessionFactory());
+    private SuperDAO(SessionFactory sessionFactory) {
+        setSessionFactory(sessionFactory);
     }
     public SessionFactory getSessionFactory() {
         return sessionFactory;
@@ -64,6 +49,15 @@ public class SuperDAO {
     public Session getSession() {
         return defaultSession;
     }
+    private void setSessionFactory(SessionFactory sessionFactory){
+        this.sessionFactory = sessionFactory;
+        this.defaultSession = getSessionFactory().openSession();
+    }
+
+
+
+
+
 
     /**
      * 在数据库中插入一个对象。
@@ -149,48 +143,49 @@ public class SuperDAO {
         t.commit();
     }
 
+
+
+    public List query(String hql,Object ... params){
+        return hqlExecuteQuery(hql, params);
+    }
     /** 在数据库中直接通过HQL检索对象。
      * @param hql HQL语句。
      * @param params HQL位置参数表。
      * @return HQL检索结果。
      */
-    public List query(String hql,Object ... params){
+    public List hqlExecuteQuery(String hql,Object ... params){
         Session defaultSession = this.getSession();
         Query q = defaultSession.createQuery(hql);
-        for (int i = 0; i < params.length; i++) {
-            q.setParameter(i,params[i]);
-        }
+        this.attachParameters(q, params);
         return q.list();
     }
 
+
     public void excuteUpdate(String sql, Object ... params){
-
-        try {
-            Session defaultSession = this.getSession();
-            Transaction t = defaultSession.beginTransaction();
-            SQLQuery query= defaultSession.createSQLQuery(sql);
-            for (int i = 0; i < params.length; i++) {
-                query.setParameter(i,params[i]);
-            }
-            query.executeUpdate();
-            t.commit();
-        }catch (Exception e){
-            String str = ExceptionInfoPrintingHelper.getStackTraceInfo(e);
-        }
-
-
-
+        sqlExecuteUpdate(sql, params);
     }
-    public List excuteQuery(String sql, Object ... params){
-
+    public void sqlExecuteUpdate(String sql, Object ... params){
         Session defaultSession = this.getSession();
-
+        Transaction t = defaultSession.beginTransaction();
         SQLQuery query= defaultSession.createSQLQuery(sql);
-        for (int i = 0; i < params.length; i++) {
-            query.setParameter(i,params[i]);
-        }
+        this.attachParameters(query, params);
+        query.executeUpdate();
+        t.commit();
+    }
 
+    public List excuteQuery(String sql, Object ... params){
+        return sqlExecuteQuery(sql, params);
+    }
+    public List sqlExecuteQuery(String sql, Object ... params){
+        Session defaultSession = this.getSession();
+        SQLQuery query= defaultSession.createSQLQuery(sql);
+        this.attachParameters(query, params);
         return query.list();
     }
 
+    private void attachParameters(Query query, Object ... parameters){
+        for (int i = 0; i < parameters.length; i++) {
+            query.setParameter(i,parameters[i]);
+        }
+    }
 }
