@@ -20,22 +20,24 @@ public class SuperDAOConfiguration {
         return this;
     }
     public SuperDAOConfiguration setUrl(String url){
-        return set("connection.url", url);
+        return set("hibernate.connection.url", url);
     }
     public SuperDAOConfiguration setUserName(String userName){
-        return set("connection.username", userName);
+        return set("hibernate.connection.username", userName);
     }
     public SuperDAOConfiguration setPassword(String password){
-        return set("connection.password", password);
+        return set("hibernate.connection.password", password);
     }
     public SuperDAOConfiguration setDriverClass(String driverClass){
-        return set("connection.driver_class", driverClass);
+        return set("hibernate.connection.driver_class", driverClass);
     }
     public SuperDAOConfiguration setDialect(String dialectClass){
-        return set("dialect", dialectClass);
+        return set("hibernate.dialect", dialectClass);
     }
 
     public Configuration getConfiguration(){
         return configuration;
     }
+
+
 }

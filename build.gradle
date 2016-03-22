@@ -47,7 +47,7 @@ task runtimeJars(type:Copy){
 }
 jar{
     baseName = 'common'
-    version = '1.0.1-beta'
+    version = '1.0.2-beta'
     from('src/main/java/'){
         include '**/*.xml'
         include '**/*.py'
@@ -58,7 +58,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.ipso.lbc'
             artifactId 'common'
-            version '1.0.1-beta'
+            version '1.0.2-beta'
             artifact jar
         }
     }
@@ -114,11 +114,7 @@ dependencies{
         exclude group:'log4j'
     }
 
-    compile('org.hibernate:hibernate-core:4.3.8.Final'){
-        exclude group:'org.jboss.logging', module:'jboss-logging'
-        exclude group:'org.jboss.logging', module:'jboss-logging-annotations'
-    }
-
+    compile('org.hibernate:hibernate-core:4.3.8.Final')
     compile('org.apache.logging.log4j:log4j-api:2.3')
     compile('org.apache.logging.log4j:log4j-core:2.3')
     compile('org.apache.logging.log4j:log4j-web:2.3')
@@ -127,6 +123,7 @@ dependencies{
     compile('org.apache.logging.log4j:log4j-jul:2.3')
     compile('org.apache.logging.log4j:log4j-taglib:2.3')
     compile('org.apache.logging.log4j:log4j-jcl:2.3')
+    compile('drivers:oracle:6.0')
 
     compile('javax.mail:mail:1.4.1')
 
