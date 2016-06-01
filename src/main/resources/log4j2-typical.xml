@@ -14,18 +14,6 @@
     </Properties>
 
     <Appenders>
-        <!--面向开发者的重要信息，仅info级别。-->
-        <RollingFile name="appender_dev_info_important" fileName="${log4j.directory}/INFO-ONLY.IMPORTANT.html" filePattern="${log4j.directory}/INFO-ONLY.IMPORTANT-%i.html">
-            <!--<PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] [%c]\n > %m%n" />-->
-            <SimplifiedHtmlLayout useLevelImage="true" doNotShowThread="true" doNotShowWholeLoggerName="true"/>
-            <Filters>
-                <ThresholdFilter onMatch="NEUTRAL"  onMismatch="DENY" level="info"/>
-                <ThresholdFilter onMatch="DENY"  onMismatch="ACCEPT" level="warn"/>
-            </Filters>
-            <Policies>
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-        </RollingFile>
         <!--面向开发者的一般信息，仅info级别。-->
         <RollingFile name="appender_dev_info" fileName="${log4j.directory}/INFO-ONLY.html" filePattern="${log4j.directory}/INFO-ONLY-%i.html">
             <!--<PatternLayout pattern="[%c]%n[%d{yyyy-MM-dd HH:mm:ss}]  > %m%n" />-->
@@ -73,14 +61,6 @@
                 <SizeBasedTriggeringPolicy size="1 MB"/>
             </Policies>
         </RollingFile>
-        <!--面向用户的错误信息，error级别或以上。-->
-        <File name="appender_user_error" fileName="${log4j.directory}/ERROR.USER.html">
-            <!--<PatternLayout pattern="[%c][%d{yyyy-MM-dd HH:mm:ss}] > %m%n" />-->
-            <SimplifiedHtmlLayout useLevelImage="true" doNotShowThread="true" doNotShowWholeLoggerName="true"/>
-            <Filters>
-                <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"   level="error"/>
-            </Filters>
-        </File>
         <!--用于其他框架的日志输出，info级别或以上-->
         <RollingFile name="appender_other_frameworks" fileName="${log4j.directory}/INFO.FRAMEWORKS.html" filePattern="INFO.FRAMEWORKS-%i.html">
             <!--<PatternLayout pattern="[%-5p][%d{yyyy-MM-dd HH:mm:ss}][%c]%n > %m%n" />-->
@@ -93,15 +73,6 @@
             </Policies>
         </RollingFile>
 
-
-        <!--标准输出，info级别或以上。-->
-        <Console name="stdOut" target="SYSTEM_OUT">
-            <PatternLayout pattern="> %d%n> %-5level from %logger{36}%n> %msg%n%n"/>
-            <!--<HTMLLayout/>-->
-            <Filters>
-                <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"   level="info"/>
-            </Filters>
-        </Console>
         <!--标准错误，error级别或以上。-->
         <Console name="stdErr" target="SYSTEM_ERR">
             <PatternLayout pattern="> %d%n> %-5level from %logger{36}%n> %msg%n%n"/>
@@ -135,37 +106,6 @@
     </Appenders>
 
     <Loggers>
-
-        <!--特殊记录仪-->
-        <!--AOP异常抛出记录仪。-->
-        <Logger name="error.exception" additivity="false" level="error">
-            <AppenderRef ref="appender_all"/>
-        </Logger>
-        <!--用户错误告警记录仪。-->
-        <Logger name="error.user" additivity="false" level="${level.org.ipso}">
-            <AppenderRef ref="appender_user_error"/>
-            <AppenderRef ref="appender_all"/>
-        </Logger>
-        <!--开发者关键信息记录仪。-->
-        <Logger name="info.developer.vital" additivity="false" level="${level.org.ipso}">
-            <AppenderRef ref="appender_dev_info_important"/>
-            <AppenderRef ref="appender_all"/>
-        </Logger>
-        <!--开发者重要信息记录仪。-->
-        <Logger name="info.developer.important" additivity="false" level="${level.org.ipso}">
-            <AppenderRef ref="appender_dev_info_important"/>
-            <AppenderRef ref="appender_all"/>
-        </Logger>
-        <!--开发者一般信息记录仪。-->
-        <Logger name="info.developer" additivity="false" level="${level.org.ipso}">
-            <AppenderRef ref="appender_dev_info"/>
-            <AppenderRef ref="appender_all"/>
-        </Logger>
-
-
-
-        <!--一般记录仪-->
-
         <!--org.ipso，一般记录仪。-->
         <Logger name="org.ipso" additivity="false" level="${level.org.ipso}">
             <AppenderRef ref="appender_dev_info"/>

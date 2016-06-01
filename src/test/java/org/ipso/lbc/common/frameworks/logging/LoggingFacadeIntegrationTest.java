@@ -11,7 +11,6 @@ import org.junit.Test;
 import static org.ipso.lbc.common.frameworks.logging.LoggingFacade.*;
 public class LoggingFacadeIntegrationTest {
     public LoggingFacadeIntegrationTest() {
-        LoggerFactory.ConfigureLog4j();
 
         LoggerFactory.getLogger("fuck").error("TEST" + this.hashCode());
         LoggerFactory.getLogger("org.lf").info("TEST");
@@ -22,34 +21,12 @@ public class LoggingFacadeIntegrationTest {
         info("testInfo");
     }
 
-    @Test
-    public void testInfoGeneral() throws Exception {
-        infoGeneral("testInfoGeneral");
-    }
-
-    @Test
-    public void testInfoImportant() throws Exception {
-        infoImportant("testInfoImportant");
-    }
-
-    @Test
-    public void testInfoVital() throws Exception {
-        infoVital("testInfoVital");
-    }
-
-//    @Test
-//    public void testErrorUser() throws Exception {
-//        errorUser("testErrorUser");
-//    }
 
     @Test
     public void testError() throws Exception {
         error("testError");
     }
-    @Test
-    public void testErrorUser() throws Exception {
-        errorUser("testErrorUser");
-    }
+
     @Test
     public void testError1() throws Exception {
         try {

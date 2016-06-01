@@ -1,3 +1,19 @@
+/*
+ * Copyright the original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.ipso.lbc.common.frameworks.logging;
 
 import org.apache.logging.log4j.Level;
@@ -6,12 +22,16 @@ import org.apache.logging.log4j.core.config.plugins.*;
 import org.apache.logging.log4j.core.layout.AbstractStringLayout;
 import org.apache.logging.log4j.core.util.Constants;
 import org.apache.logging.log4j.core.util.Transform;
+import org.ipso.lbc.common.utils.StringUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Outputs events as rows in an HTML table on an HTML page.
@@ -22,12 +42,11 @@ import java.util.Date;
  */
 @Plugin(name = "SimplifiedHtmlLayout", category = "Core", elementType = "Layout", printObject = true)
 public class SimplifiedHtmlLayout extends AbstractStringLayout {
+    public static final String DEFAULT_FONT_FAMILY = "arial,sans-serif";
     private static final int BUF_SIZE = 256;
     private static final String TRACE_PREFIX = "<br />&nbsp;&nbsp;&nbsp;&nbsp;";
     private static final String REGEXP = Constants.LINE_SEPARATOR.equals("\n") ? "\n" : Constants.LINE_SEPARATOR + "|\n";
     private static final String DEFAULT_CONTENT_TYPE = "text/html";
-    public static final String DEFAULT_FONT_FAMILY = "arial,sans-serif";
-
     private static final String ICONS_DIR = "icon/";
     private static final String EMPTY_TD = "";//"<td align=\"center\">N/A</td>";
     private static final String EMPTY_TH = "";//"<th align=\"center\">N/A</th>";
@@ -44,40 +63,9 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
     private final String title;
 
     private final String contentType;
-
-    /**Possible font sizes */
-    public static enum FontSize {
-        SMALLER("smaller"), XXSMALL("xx-small"), XSMALL("x-small"), SMALL("small"), MEDIUM("medium"), LARGE("large"),
-        XLARGE("x-large"), XXLARGE("xx-large"),  LARGER("larger");
-
-        private final String size;
-
-        private FontSize(final String size) {
-            this.size = size;
-        }
-
-        public String getFontSize() {
-            return size;
-        }
-
-        public static FontSize getFontSize(final String size) {
-            for (final FontSize fontSize : values()) {
-                if (fontSize.size.equals(size)) {
-                    return fontSize;
-                }
-            }
-            return SMALLER;
-        }
-
-        public FontSize larger() {
-            return this.ordinal() < XXLARGE.ordinal() ? FontSize.values()[this.ordinal() + 1] : this;
-        }
-    }
-
     private final String font;
     private final String fontSize;
     private final String headerSize;
-
     private SimplifiedHtmlLayout(final boolean doNotShowLevel, boolean doNotShowSource, boolean doNotShowThread, boolean doNotShowWholeLoggerName, boolean useLevelImage, int maxMessageLength, final String title, final String contentType, final Charset charset,
                                  final String font, final String fontSize, final String headerSize) {
         super(charset);
@@ -92,6 +80,42 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
         this.font = font;
         this.fontSize = fontSize;
         this.headerSize = headerSize;
+    }
+
+    @PluginFactory
+    public static SimplifiedHtmlLayout createLayout(
+            @PluginAttribute(value = "doNotShowLevel", defaultBoolean = false) final boolean doNotShowLevel,
+            @PluginAttribute(value = "doNotShowSource", defaultBoolean = false) final boolean doNotShowSource,
+            @PluginAttribute(value = "doNotShowThread", defaultBoolean = false) final boolean doNotShowThread,
+            @PluginAttribute(value = "doNotShowWholeLoggerName", defaultBoolean = false) final boolean doNotShowWholeLoggerName,
+            @PluginAttribute(value = "useLevelImage", defaultBoolean = false) final boolean useLevelImage,
+            @PluginAttribute(value = "maxMessageLength", defaultInt = 0) final int maxMessageLength,
+            @PluginAttribute(value = "title", defaultString = "Log messages powered by Log4j2") final String title,
+            @PluginAttribute("contentType") String contentType,
+            @PluginAttribute(value = "charset", defaultString = "UTF-8") final Charset charset,
+            @PluginAttribute("fontSize") String fontSize,
+            @PluginAttribute(value = "fontName", defaultString = DEFAULT_FONT_FAMILY) final String font) {
+        final FontSize fs = FontSize.getFontSize(fontSize);
+        fontSize = fs.getFontSize();
+        final String headerSize = fs.larger().getFontSize();
+        if (contentType == null) {
+            contentType = DEFAULT_CONTENT_TYPE + "; charset=" + charset;
+        }
+        return new SimplifiedHtmlLayout(doNotShowLevel, doNotShowSource, doNotShowThread, doNotShowWholeLoggerName, useLevelImage, maxMessageLength, title, contentType, charset, font, fontSize, headerSize);
+    }
+
+    /**
+     * Creates an HTML Layout using the default settings.
+     *
+     * @return an HTML Layout.
+     */
+    public static SimplifiedHtmlLayout createDefaultLayout() {
+        return newBuilder().build();
+    }
+
+    @PluginBuilderFactory
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     private String addCharsetToContentType(final String contentType) {
@@ -114,24 +138,34 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
         sbuf.append(Constants.LINE_SEPARATOR).append("<tr>").append(Constants.LINE_SEPARATOR);
 
         //级别
-        sbuf.append(doNotShowLevel ?EMPTY_TD:getTableCellOfLevel(event)).append(Constants.LINE_SEPARATOR);
+        sbuf.append(doNotShowLevel ? EMPTY_TD : getTableCellOfLevel(event)).append(Constants.LINE_SEPARATOR);
         //时间
         sbuf.append("<td style=\"width:3.2cm\">");
         sbuf.append(Transform.escapeHtmlTags(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
         sbuf.append("</td>").append(Constants.LINE_SEPARATOR);
         //来源
-        sbuf.append(doNotShowSource?EMPTY_TD:getTableCellOfSource(event)).append(Constants.LINE_SEPARATOR);
+        sbuf.append(doNotShowSource ? EMPTY_TD : getTableCellOfSource(event)).append(Constants.LINE_SEPARATOR);
         //信息
         sbuf.append("<td>");
         String msg = event.getMessage().getFormattedMessage();
         Integer len = msg.length();
-        if (maxMessageLength > 0 && len>maxMessageLength){
-                msg = msg.substring(0, maxMessageLength) + " ... ";
+        if (maxMessageLength > 0 && len > maxMessageLength) {
+            msg = msg.substring(0, maxMessageLength) + " ... ";
         }
-        sbuf.append(Transform.escapeHtmlTags(msg).replaceAll(REGEXP, "<br />"));
+        try {
+            //将{}内的内容显示为蓝色粗体
+            msg = t1(msg, "<strong style='color:#0000FF'>", "</strong>", "(?<=\\{)[^}]*(?=\\})");
+            //将[]内的内容显示为红色粗体
+            msg = t1(msg, "<strong style='color:#FF0000'>", "</strong>", "(?<=\\[)[^}]*(?=\\])");
+        } catch (PatternSyntaxException e){
+            msg = "<strong style='color:#FF0000'>[PatternSyntaxException when render log message]</strong>" + msg;
+        }
+
+
+        sbuf.append(msg.replaceAll(REGEXP, "<br />"));
         sbuf.append("</td>").append(Constants.LINE_SEPARATOR);
         //线程
-        sbuf.append(doNotShowThread?EMPTY_TD:getTableCellOfThread(event)).append(Constants.LINE_SEPARATOR);
+        sbuf.append(doNotShowThread ? EMPTY_TD : getTableCellOfThread(event)).append(Constants.LINE_SEPARATOR);
 
         sbuf.append("</tr>").append(Constants.LINE_SEPARATOR);
 
@@ -162,40 +196,40 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
         return sbuf.toString();
     }
 
-    protected String getTableCellOfThread(LogEvent event){
+    protected String getTableCellOfThread(LogEvent event) {
         String escapedThread = Transform.escapeHtmlTags(event.getThreadName());
         return "<td>" + escapedThread + "</td>";
     }
-    protected String getTableCellOfSource(final  LogEvent event){
+
+    protected String getTableCellOfSource(final LogEvent event) {
         String src = "<td>";
         String logger = Transform.escapeHtmlTags(event.getLoggerName());
-        if (logger.matches("(.*)user(.*)")){
-            src += "<img src=\"" + ICONS_DIR+"user.png" + "\"/>";
-        } else if (logger.matches("(.*)vital(.*)")){
-            src += "<img src=\"" + ICONS_DIR+"vital.png" + "\"/>";
-        } else if (logger.matches("(.*)important(.*)")){
-            src += "<img src=\"" + ICONS_DIR+"important.png" + "\"/>";
-        }else {
+        if (logger.matches("(.*)user(.*)")) {
+            src += "<img src=\"" + ICONS_DIR + "user.png" + "\"/>";
+        } else if (logger.matches("(.*)vital(.*)")) {
+            src += "<img src=\"" + ICONS_DIR + "vital.png" + "\"/>";
+        } else if (logger.matches("(.*)important(.*)")) {
+            src += "<img src=\"" + ICONS_DIR + "important.png" + "\"/>";
+        } else {
             if (logger.isEmpty()) {
                 src += "[UNKNOWN]";
-            }
-            else {
+            } else {
                 if (doNotShowWholeLoggerName) {
                     try {
                         Integer index;
                         //logger -> org.ipso.lbc.common.util.StringUtils
                         //first -> org.
-                        index = logger.indexOf(".")+1;
+                        index = logger.indexOf(".") + 1;
                         String first = logger.substring(0, index);
                         logger = logger.substring(index);
                         //second -> ipso.lbc.common.util.StringUtils
-                        index = logger.indexOf(".")+1;
-                        String second = logger.substring(0,index);
+                        index = logger.indexOf(".") + 1;
+                        String second = logger.substring(0, index);
                         logger = logger.substring(index);
-                        String fina = logger.substring(logger.lastIndexOf(".")+1);
-                        src += first + second + " ... "+ fina;
-                    }catch (Exception e){
-                        src += "[ERROR:CANNOT GET THE WHOLE PACKAGE NAME]";
+                        String fina = logger.substring(logger.lastIndexOf(".") + 1);
+                        src += first + second + " ... " + fina;
+                    } catch (Exception e) {
+                        src += "</strong style='color:#FF0000'>[ERROR:CANNOT GET THE WHOLE PACKAGE NAME]</strong>";
                     }
                 } else {
                     src += logger;
@@ -205,33 +239,34 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
         src += "</td>";
         return src;
     }
-    protected String getTableCellOfLevel(final LogEvent event){
+
+    protected String getTableCellOfLevel(final LogEvent event) {
         String s = "<td style=\"width:0.6cm\" align = \"center\">";
 
 
-        if (useLevelImage){//若采用图片
-            s += "<img src=\"" + ICONS_DIR ;
-            if (event.getLevel().equals(Level.TRACE)){
+        if (useLevelImage) {//若采用图片
+            s += "<img src=\"" + ICONS_DIR;
+            if (event.getLevel().equals(Level.TRACE)) {
                 s += "trace";
-            } else if(event.getLevel().equals(Level.DEBUG)){
+            } else if (event.getLevel().equals(Level.DEBUG)) {
                 s += "debug";
-            } else if(event.getLevel().equals(Level.INFO)){
+            } else if (event.getLevel().equals(Level.INFO)) {
                 s += "info";
                 String logger = event.getLoggerName();
-                if (logger.matches("(.*)vital(.*)")){
+                if (logger.matches("(.*)vital(.*)")) {
                     s += "-vital";
-                } else if (logger.matches("(.*)important(.*)")){
+                } else if (logger.matches("(.*)important(.*)")) {
                     s += "-important";
                 }
-            } else if(event.getLevel().equals(Level.WARN)){
+            } else if (event.getLevel().equals(Level.WARN)) {
                 s += "warn";
-            } else if(event.getLevel().equals(Level.ERROR)){
+            } else if (event.getLevel().equals(Level.ERROR)) {
                 s += "error";
-            } else if(event.getLevel().equals(Level.FATAL)){
+            } else if (event.getLevel().equals(Level.FATAL)) {
                 s += "fatal";
             }
             s += ".png\" />";
-        }else{
+        } else {
             if (event.getLevel().equals(Level.DEBUG)) {
                 s += ("<font color=\"#339933\">");
                 s += (Transform.escapeHtmlTags(String.valueOf(event.getLevel())));
@@ -256,6 +291,17 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
      */
     public String getContentType() {
         return contentType;
+    }
+
+
+    private   String t1(String source, String prefix, String postfix, String regex){
+        String patternString = regex;
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(source);
+        while (matcher.find()){
+                source = source.replaceAll(matcher.group(), prefix + matcher.group() + postfix);
+        }
+        return source;
     }
 
     private void appendThrowableAsHtml(final Throwable throwable, final StringBuilder sbuf) {
@@ -295,6 +341,7 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
 
     /**
      * Returns appropriate HTML headers.
+     *
      * @return The header as a byte array.
      */
     @Override
@@ -324,21 +371,20 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
         sbuf.append(Constants.LINE_SEPARATOR);
 
         sbuf.append("<tr>").append(Constants.LINE_SEPARATOR);
-        sbuf.append(doNotShowLevel ?EMPTY_TH:"<th>Level</th>").append(Constants.LINE_SEPARATOR);
+        sbuf.append(doNotShowLevel ? EMPTY_TH : "<th>Level</th>").append(Constants.LINE_SEPARATOR);
         sbuf.append("<th>Time</th>").append(Constants.LINE_SEPARATOR);
-        sbuf.append(doNotShowSource?EMPTY_TH:"<th>Source</th>").append(Constants.LINE_SEPARATOR);
+        sbuf.append(doNotShowSource ? EMPTY_TH : "<th>Source</th>").append(Constants.LINE_SEPARATOR);
         sbuf.append("<th>Message</th>").append(Constants.LINE_SEPARATOR);
-        sbuf.append(doNotShowThread?EMPTY_TH:"<th>Thread</th>").append(Constants.LINE_SEPARATOR);
+        sbuf.append(doNotShowThread ? EMPTY_TH : "<th>Thread</th>").append(Constants.LINE_SEPARATOR);
         sbuf.append("</tr>").append(Constants.LINE_SEPARATOR);
 
 
         return sbuf.toString().getBytes(getCharset());
     }
 
-
-
     /**
      * Returns the appropriate HTML footers.
+     *
      * @return the footer as a byet array.
      */
     @Override
@@ -350,41 +396,35 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
         return getBytes(sbuf.toString());
     }
 
-
-    @PluginFactory
-    public static SimplifiedHtmlLayout createLayout(
-            @PluginAttribute(value = "doNotShowLevel", defaultBoolean = false) final boolean doNotShowLevel,
-            @PluginAttribute(value = "doNotShowSource", defaultBoolean = false) final boolean doNotShowSource,
-            @PluginAttribute(value = "doNotShowThread", defaultBoolean = false) final boolean doNotShowThread,
-            @PluginAttribute(value = "doNotShowWholeLoggerName", defaultBoolean = false) final boolean doNotShowWholeLoggerName,
-            @PluginAttribute(value = "useLevelImage", defaultBoolean = false) final boolean useLevelImage,
-            @PluginAttribute(value = "maxMessageLength", defaultInt = 0) final int maxMessageLength,
-            @PluginAttribute(value = "title", defaultString = "Log messages powered by Log4j2") final String title,
-            @PluginAttribute("contentType") String contentType,
-            @PluginAttribute(value = "charset", defaultString = "UTF-8") final Charset charset,
-            @PluginAttribute("fontSize") String fontSize,
-            @PluginAttribute(value = "fontName", defaultString = DEFAULT_FONT_FAMILY) final String font) {
-        final FontSize fs = FontSize.getFontSize(fontSize);
-        fontSize = fs.getFontSize();
-        final String headerSize = fs.larger().getFontSize();
-        if (contentType == null) {
-            contentType = DEFAULT_CONTENT_TYPE + "; charset=" + charset;
-        }
-        return new SimplifiedHtmlLayout(doNotShowLevel, doNotShowSource, doNotShowThread, doNotShowWholeLoggerName, useLevelImage, maxMessageLength, title, contentType, charset, font, fontSize, headerSize);
-    }
-
     /**
-     * Creates an HTML Layout using the default settings.
-     *
-     * @return an HTML Layout.
+     * Possible font sizes
      */
-    public static SimplifiedHtmlLayout createDefaultLayout() {
-        return newBuilder().build();
-    }
+    public static enum FontSize {
+        SMALLER("smaller"), XXSMALL("xx-small"), XSMALL("x-small"), SMALL("small"), MEDIUM("medium"), LARGE("large"),
+        XLARGE("x-large"), XXLARGE("xx-large"), LARGER("larger");
 
-    @PluginBuilderFactory
-    public static Builder newBuilder() {
-        return new Builder();
+        private final String size;
+
+        private FontSize(final String size) {
+            this.size = size;
+        }
+
+        public static FontSize getFontSize(final String size) {
+            for (final FontSize fontSize : values()) {
+                if (fontSize.size.equals(size)) {
+                    return fontSize;
+                }
+            }
+            return SMALLER;
+        }
+
+        public String getFontSize() {
+            return size;
+        }
+
+        public FontSize larger() {
+            return this.ordinal() < XXLARGE.ordinal() ? FontSize.values()[this.ordinal() + 1] : this;
+        }
     }
 
     public static class Builder implements org.apache.logging.log4j.core.util.Builder<SimplifiedHtmlLayout> {

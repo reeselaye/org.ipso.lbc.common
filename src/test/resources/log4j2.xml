@@ -5,24 +5,130 @@
   ~ 所有个人和组织均可不受约束地将该文件所包含的代码用于非商业用途。若需要将其用于商业软件的开发，请首先联系所有者以取得许可。
   -->
 <Configuration status="error" strict="false" name="default" monitorInterval="60" package="org.ipso.lbc.common.frameworks.logging">
+
     <Properties>
+        <Property name="log4j.directory">log</Property>
+        <Property name="level.root">all</Property>
+        <Property name="level.org.ipso">debug</Property>
+        <Property name="level.others">debug</Property>
     </Properties>
+
     <Appenders>
+        <!--面向开发者的一般信息，仅info级别。-->
+        <RollingFile name="appender_dev_info" fileName="${log4j.directory}/INFO-ONLY.html" filePattern="${log4j.directory}/INFO-ONLY-%i.html">
+            <!--<PatternLayout pattern="[%c]%n[%d{yyyy-MM-dd HH:mm:ss}]  > %m%n" />-->
+            <SimplifiedHtmlLayout useLevelImage="true" doNotShowThread="true" doNotShowWholeLoggerName="true"/>
+            <Filters>
+                <ThresholdFilter onMatch="NEUTRAL"  onMismatch="DENY" level="info"/>
+                <ThresholdFilter onMatch="DENY"  onMismatch="ACCEPT" level="warn"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+        <!--面向开发者的追踪信息，仅debug级别。-->
+        <RollingFile name="appender_dev_debug" fileName="${log4j.directory}/DEBUG-ONLY.html" filePattern="${log4j.directory}/DEBUG-ONLY-%i.html">
+            <!--<PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}][%c]%n > %m%n" />-->
+            <SimplifiedHtmlLayout useLevelImage="true" doNotShowWholeLoggerName="true"/>
+            <Filters>
+                <ThresholdFilter onMatch="NEUTRAL"  onMismatch="DENY" level="debug"/>
+                <ThresholdFilter onMatch="DENY"  onMismatch="ACCEPT" level="info"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+        <!--面向开发者的追踪信息，仅trace级别。-->
+        <RollingFile name="appender_dev_trace" fileName="${log4j.directory}/TRACE-ONLY.html" filePattern="${log4j.directory}/TRACE-ONLY-%i.html">
+            <!--<PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}][%c]%n > %m%n" />-->
+            <SimplifiedHtmlLayout useLevelImage="true" doNotShowWholeLoggerName="true"/>
+            <Filters>
+                <ThresholdFilter onMatch="NEUTRAL"  onMismatch="DENY" level="trace"/>
+                <ThresholdFilter onMatch="DENY"  onMismatch="ACCEPT" level="debug"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+        <!--面向开发者的错误信息，warn级别或以上。-->
+        <RollingFile name="appender_dev_warn" fileName="${log4j.directory}/WARN.html" filePattern="${log4j.directory}/WARN-%i.html">
+            <!--<PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}][%c]%n%m%n" />-->
+            <SimplifiedHtmlLayout useLevelImage = "true" doNotShowWholeLoggerName="true"/>
+            <Filters>
+                <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"  level="warn"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+        <!--用于其他框架的日志输出，info级别或以上-->
+        <RollingFile name="appender_other_frameworks" fileName="${log4j.directory}/INFO.FRAMEWORKS.html" filePattern="INFO.FRAMEWORKS-%i.html">
+            <!--<PatternLayout pattern="[%-5p][%d{yyyy-MM-dd HH:mm:ss}][%c]%n > %m%n" />-->
+            <SimplifiedHtmlLayout useLevelImage = "true" maxMessageLength="100" doNotShowWholeLoggerName="true"/>
+            <Filters>
+                <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"   level="INFO"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <!--标准错误，error级别或以上。-->
         <Console name="stdErr" target="SYSTEM_ERR">
             <PatternLayout pattern="> %d%n> %-5level from %logger{36}%n> %msg%n%n"/>
             <Filters>
-                <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"   level="debug"/>
+                <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"   level="info"/>
             </Filters>
         </Console>
+
+        <!--非法输出位置。-->
+        <RollingFile name="unspecified" fileName="${log4j.directory}/INVALID.ALL.html" filePattern="INVALID.ALL-%i.html">
+            <!--<PatternLayout pattern="[%-5p][%d{yyyy-MM-dd HH:mm:ss}][%c]%n > %m%n%n" />-->
+            <SimplifiedHtmlLayout  useLevelImage = "true"/>
+            <Filters>
+                <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"   level="all"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <!--所有org.ipso日志的输出位置。-->
+        <RollingFile name="appender_all" fileName="${log4j.directory}/ALL.html" filePattern="ALL-%i.html">
+            <SimplifiedHtmlLayout doNotShowWholeLoggerName="true"  useLevelImage = "true"/>
+            <Filters>
+                <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"   level="all"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
-        <Logger name="org.ipso" additivity="false" level="debug">
+        <!--org.ipso，一般记录仪。-->
+        <Logger name="org.ipso" additivity="false" level="${level.org.ipso}">
+            <AppenderRef ref="appender_dev_info"/>
+            <AppenderRef ref="appender_dev_debug"/>
+            <AppenderRef ref="appender_dev_trace"/>
+            <AppenderRef ref="appender_dev_warn"/>
+            <AppenderRef ref="appender_all"/>
             <AppenderRef ref="stdErr"/>
         </Logger>
-
-        <Root level="warn">
-            <AppenderRef ref="stdErr"/>
+        <!--用于其它框架的记录仪。-->
+        <Logger name="org" additivity="false" level="${level.others}">
+            <AppenderRef ref="appender_other_frameworks"/>
+        </Logger>
+        <Logger name="com" additivity="false" level="${level.others}">
+            <AppenderRef ref="appender_other_frameworks"/>
+        </Logger>
+        <Logger name="freemarker" additivity="false"  level="${level.others}">
+            <AppenderRef ref="appender_other_frameworks"/>
+        </Logger>
+        <!--根记录仪。-->
+        <Root level="${level.root}">
+            <AppenderRef ref="unspecified"/>
+            <AppenderRef ref="appender_all"/>
         </Root>
     </Loggers>
 </Configuration>
