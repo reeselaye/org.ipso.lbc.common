@@ -105,8 +105,10 @@ public class CommandWithRetries extends BasicCommand {
             preHandler.handle(this);
         }
         Exception failException;
-        String command = (ObjectUtils.getHash4(this) + promptMessage + " with receiver info{" + receiver.info()+ "}" );
-        debug("Command {" + command + "} starting.");
+        String command = " Command {" + promptMessage + " with receiver info<" + receiver.info()+ ">}";
+        String id = "[" + ObjectUtils.getHash4(this) + "]";
+        String prefix = id + command;
+        debug(prefix + " starting.");
         do {
             failException = null;
             try {
@@ -115,11 +117,11 @@ public class CommandWithRetries extends BasicCommand {
                 failException = e;
             }
             if (failException != null) {
-                debug("Command {" + command + "} failed on "+failTimes+" retry.");
+                debug(prefix + " failed on "+failTimes+" retry.");
                 failTimes++;
             }
             else {
-                info("Command {" + command + "} success.");
+                info(prefix + " success.");
                 break;
             }
 
@@ -128,9 +130,9 @@ public class CommandWithRetries extends BasicCommand {
         if(isFinallyFailed()){
             // logging
             if (postHandler!= null){//due to exception and there's handler
-                error(command + "is finally failed, but there's a post handler{" +postHandler.toString() +  "} which might deal with it.", failException);
+                error(prefix + "is finally failed, but there's a post handler{" +postHandler.toString() +  "} which might deal with it.", failException);
             } else {
-                error(command + "is finally failed, and no handler is configured.", failException);
+                error(prefix + "is finally failed, and no handler is configured.", failException);
             }
         }
 
