@@ -6,8 +6,7 @@
 
 package org.ipso.lbc.common.aop;
 
-import org.apache.logging.log4j.Logger;
-import org.ipso.lbc.common.frameworks.logging.LoggerFactory;
+import org.ipso.lbc.common.frameworks.logging.LoggingFacade;
 import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.aop.ThrowsAdvice;
 
@@ -19,13 +18,10 @@ import java.lang.reflect.Method;
 public class AopTraceFunctional implements AfterReturningAdvice, ThrowsAdvice {
     @Override
     public void afterReturning(Object o, Method method, Object[] objects, Object o1) throws Throwable {
-        success.info((o1).toString());
+        LoggingFacade.info((o1).toString());
     }
 
     public void afterThrowing(Method m, Object[] os, Object target, Throwable throwable) {
-        fail.error(throwable.getMessage());
+        LoggingFacade.error(throwable.getMessage());
     }
-
-    private static Logger success = LoggerFactory.getLogger("【预测成功】");
-    private static Logger fail = LoggerFactory.getLogger("【预测失败】");
 }

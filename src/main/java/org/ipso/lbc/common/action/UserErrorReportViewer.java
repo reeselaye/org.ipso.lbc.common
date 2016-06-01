@@ -7,9 +7,7 @@
 package org.ipso.lbc.common.action;
 
 import com.opensymphony.xwork2.ActionSupport;
-import org.ipso.lbc.common.exception.handler.ExceptionInfoPrintingHelper;
-import org.ipso.lbc.common.frameworks.logging.LoggingReader;
-import org.ipso.lbc.common.resource.CommonPaths;
+import org.ipso.lbc.common.frameworks.logging.LoggingFacade;
 
 /**
  * 信息：李倍存 创建于 2016/01/11 11:05。电邮 1174751315@qq.com。<br>
@@ -38,13 +36,14 @@ public class UserErrorReportViewer extends ActionSupport {
     public String execute() throws Exception {
         try {
             warning = "OK";
-            errorReports = LoggingReader.getLines(CommonPaths.getContextLog()+"lpu_warn.log");
+            errorReports = null;
             if (errorReports == null || errorReports.length == 0){
                 errorReports = new String[]{};
             }
             return SUCCESS;
         }catch (Exception e){
-            return warn(ExceptionInfoPrintingHelper.getStackTraceInfo(e));
+            LoggingFacade.error("[no details]", e);
+            return e.getMessage();
         }
 
     }
