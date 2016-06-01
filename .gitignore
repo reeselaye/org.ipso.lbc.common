@@ -3,3 +3,4 @@ ui/
 build/
 gradle-app.setting
 
+.idea/
