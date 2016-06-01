@@ -13,7 +13,6 @@ package org.ipso.lbc.common.utils;
 public class ObjectUtils {
     public static String getHash4(Object o){
         Integer code = Math.abs(o.hashCode());
-
-        return "  ["+String.format("%04d",code).substring(0,4)+"]  ";
+        return String.format("%04d",code).substring(0,4);
     }
 }
