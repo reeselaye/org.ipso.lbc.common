@@ -71,7 +71,10 @@ public class DateUtil {
         return Date2StringAdapter.toString(new Date(new java.util.Date().getTime()));
     }
     public static String getNow(){
-        return new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(new java.util.Date());
+        return getISOFormat(new java.util.Date());
+    }
+    public static String getISOFormat(java.util.Date date){
+        return new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(date);
     }
     private static Calendar initCalendar(Date date){
         Calendar calendar=new GregorianCalendar();
