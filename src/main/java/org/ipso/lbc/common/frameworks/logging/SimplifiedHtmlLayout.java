@@ -153,15 +153,15 @@ public class SimplifiedHtmlLayout extends AbstractStringLayout {
             msg = msg.substring(0, maxMessageLength) + " ... ";
         }
         try {
-            //将{}内的内容显示为蓝色粗体
-            msg = t1(msg, "<strong style='color:#0000FF'>", "</strong>", "(?<=\\{)[^}]*(?=\\})");
-            //将[]内的内容显示为红色粗体
-            msg = t1(msg, "<strong style='color:#FF0000'>", "</strong>", "(?<=\\[)[^}]*(?=\\])");
+            msg = msg.replace("<", "<strong style='color:#00FF00'>");
+            msg = msg.replace(">", "</strong>");            
+            msg = msg.replace("{", "<strong style='color:#0000FF'>");
+            msg = msg.replace("}", "</strong>");
+            msg = msg.replace("[", "<strong style='color:#FF0000'>");
+            msg = msg.replace("]", "</strong>");
         } catch (PatternSyntaxException e){
             msg = "<strong style='color:#FF0000'>[PatternSyntaxException when render log message]</strong>" + msg;
         }
-
-
         sbuf.append(msg.replaceAll(REGEXP, "<br />"));
         sbuf.append("</td>").append(Constants.LINE_SEPARATOR);
         //线程

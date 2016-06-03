@@ -70,6 +70,13 @@ public class LoggingFacade {
         }
     }
 
+    public static void fatal(String msg, Throwable t) {
+        Logger logger = LoggerFactory.getLogger(3);
+        if (logger.isFatalEnabled()) {
+            logger.fatal(msg, t);
+        }
+    }
+
     /**
      * 常规流程跟踪。
      *
