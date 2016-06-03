@@ -12,7 +12,9 @@ apply plugin:'maven-publish'
         maven  {
             url "http://repo1.maven.org/maven2"
         }
-        mavenLocal()
+        maven {
+            url "file://E:/Cloud/Kuaipan/Portable/apache-maven-3.1.1/repo"
+        }
    }
 
 
@@ -63,7 +65,9 @@ publishing {
         }
     }
     repositories{
-        mavenLocal()
+        maven {
+            url "file://E:/Cloud/Kuaipan/Portable/apache-maven-3.1.1/repo"
+        }
     }
 }
 

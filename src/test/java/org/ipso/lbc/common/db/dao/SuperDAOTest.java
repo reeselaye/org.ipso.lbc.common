@@ -3,15 +3,13 @@ package org.ipso.lbc.common.db.dao;
 import org.ipso.lbc.common.config.Configuration;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class SuperDAOTest {
 
     @Test
     public void testCreate() throws Exception {
         Configuration configuration = Configuration.INSTANCE;
         SuperDAO superDAO = SuperDAO.create(
-                new SuperDAOConfiguration("hibernate.cfg.main.xml")
+                new SessionFactoryConfiguration("hibernate.cfg.main.xml")
                     .setDialect("org.hibernate.dialect.Oracle10gDialect")
                     .setDriverClass("oracle.jdbc.OracleDriver")
                     .setUrl(        "jdbc:oracle:thin:@//"
