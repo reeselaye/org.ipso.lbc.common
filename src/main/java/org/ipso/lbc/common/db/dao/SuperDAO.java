@@ -18,8 +18,10 @@
 package org.ipso.lbc.common.db.dao;
 
 import org.hibernate.*;
+import org.ipso.lbc.common.frameworks.logging.LoggingFacade;
 
 import java.io.Serializable;
+import java.lang.*;
 import java.util.List;
 
 /**
@@ -38,7 +40,7 @@ public class SuperDAO {
      *
      * @param configuration 给定配置对象
      */
-    public SuperDAO(SuperDAOConfiguration configuration) {
+    private SuperDAO(SuperDAOConfiguration configuration) {
         this(configuration.getConfiguration().buildSessionFactory());
     }
 
@@ -52,7 +54,17 @@ public class SuperDAO {
     }
 
     public static SuperDAO create(SuperDAOConfiguration configuration) {
-        return new SuperDAO(configuration);
+        SuperDAO superDAO = null;
+        try {
+            LoggingFacade.debug("Creating the SuperDAO instance...");
+            superDAO = new SuperDAO(configuration);
+            LoggingFacade.info("Successfully to create the SuperDAO instance{everything of database works fine}. [" + configuration.getConfiguration().toString() + "]");
+        } catch (HibernateException e){
+            LoggingFacade.fatal("The application is terminated because we cannot access the specified database.");
+            System.exit(-1);
+        }
+
+        return superDAO;
     }
 
     public SessionFactory getSessionFactory() {
