@@ -9,6 +9,7 @@ package org.ipso.lbc.common.frameworks.spring;
 import org.ipso.lbc.common.boot.SystemUtils;
 import org.ipso.lbc.common.config.Configuration;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -57,8 +58,12 @@ public class SpringApplicationContextUtil implements ApplicationContextAware {
             for (int i = 0; i < t2.length; i++) {
                 t1 += t2[i];
             }
-            info(prefix + "but everything would works fine because we load the spring context from " + t1);
-            setContext(new ClassPathXmlApplicationContext(t2));
+            try {
+                setContext(new ClassPathXmlApplicationContext(t2));
+                info(prefix + "but everything would works fine because we load the spring context from " + t1);
+            } catch (BeansException e){
+                SystemUtils.logFatalAndExit("Please ensure the files existing {specified by " + DEFAULT_PROPERTY_NAME + " in the .properties files}, and {they can only be placed at the root of CLASSPATH}.", e, -1);
+            }
         }
         return context;
     }
