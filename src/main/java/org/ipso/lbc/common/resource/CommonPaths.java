@@ -48,7 +48,7 @@ public class CommonPaths {
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    LoggingFacade.info("The working directory root is set to: " + t);
+                    LoggingFacade.info("The working directory root is set to {" + t + "}.");
                 }
             },1000);
         }

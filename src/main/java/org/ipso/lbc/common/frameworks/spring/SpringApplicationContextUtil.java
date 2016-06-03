@@ -6,6 +6,7 @@
 
 package org.ipso.lbc.common.frameworks.spring;
 
+import org.ipso.lbc.common.boot.SystemUtils;
 import org.ipso.lbc.common.config.Configuration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -35,21 +36,20 @@ public class SpringApplicationContextUtil implements ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         context=applicationContext;
         if (context!=null){
-            info("Spring container is successfully initialized with ApplicationContextAware.");
+            info("ApplicationContext is successfully initialized with ApplicationContextAware.");
         } else{
-            fatal("Spring container is failed to be initialized, and the application is shutting down.");
+            fatal("ApplicationContext is failed to be initialized, and the application is shutting down.");
             System.exit(-1);
         }
     }
 
     public static ApplicationContext getContext(){
         if (context == null){
-            String prefix = "The ApplicationContextAware is inactive, ";
-            debug(prefix + "trying to load the spring context from specified files.");
-            String configurations = Configuration.INSTANCE.getConfigurationEnsureReturn(DEFAULT_PROPERTY_NAME);
-            if (configurations.equals("")){
-                fatal(prefix + "and no spring configuration is specified, please provide " + DEFAULT_PROPERTY_NAME + " in any .properties file.");
-                System.exit(-1);
+            String prefix = "The ApplicationContext is inactive, ";
+            debug(prefix + "trying to load the spring context from specified files...");
+            String configurations = Configuration.INSTANCE.getConfiguration(DEFAULT_PROPERTY_NAME);
+            if (configurations == null){
+                SystemUtils.logFatalAndExit(prefix + "and no spring configuration is specified, so the application is shutting down. Please provide " + DEFAULT_PROPERTY_NAME + " in any .properties file.", -1);
             }
 
             String t1="";
