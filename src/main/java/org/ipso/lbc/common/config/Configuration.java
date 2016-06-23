@@ -83,7 +83,7 @@ public class Configuration {
     public String getConfigurationEnsureReturn(String name){
         String value = getAllGatheredProperties().getProperty(name);
         if (value==null ||  value.isEmpty()){
-            error("Attempt to get an empty property{key:" + name + "}, the default value " + DEFAULT_PROPERTY_VALUE + " is returned.", new AppCheckedException());
+            warn("Attempt to get an empty property{key:" + name + "}, the default value " + DEFAULT_PROPERTY_VALUE + " is returned.");
             return DEFAULT_PROPERTY_VALUE;
         }
         return value;
