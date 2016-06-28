@@ -62,7 +62,7 @@
             </Policies>
         </RollingFile>
         <!--用于其他框架的日志输出，info级别或以上-->
-        <RollingFile name="appender_other_frameworks" fileName="${log4j.directory}/INFO.FRAMEWORKS.html" filePattern="INFO.FRAMEWORKS-%i.html">
+        <RollingFile name="appender_other_frameworks" fileName="${log4j.directory}/INFO.FRAMEWORKS.html" filePattern="${log4j.directory}/INFO.FRAMEWORKS-%i.html">
             <!--<PatternLayout pattern="[%-5p][%d{yyyy-MM-dd HH:mm:ss}][%c]%n > %m%n" />-->
             <SimplifiedHtmlLayout useLevelImage = "true" maxMessageLength="100" doNotShowWholeLoggerName="true"/>
             <Filters>
@@ -82,7 +82,7 @@
         </Console>
 
         <!--非法输出位置。-->
-        <RollingFile name="unspecified" fileName="${log4j.directory}/INVALID.ALL.html" filePattern="INVALID.ALL-%i.html">
+        <RollingFile name="unspecified" fileName="${log4j.directory}/INVALID.ALL.html" filePattern="${log4j.directory}/INVALID.ALL-%i.html">
             <!--<PatternLayout pattern="[%-5p][%d{yyyy-MM-dd HH:mm:ss}][%c]%n > %m%n%n" />-->
             <SimplifiedHtmlLayout  useLevelImage = "true"/>
             <Filters>
@@ -94,7 +94,7 @@
         </RollingFile>
 
         <!--所有org.ipso日志的输出位置。-->
-        <RollingFile name="appender_all" fileName="${log4j.directory}/ALL.html" filePattern="ALL-%i.html">
+        <RollingFile name="appender_all" fileName="${log4j.directory}/ALL.html" filePattern="${log4j.directory}/ALL-%i.html">
             <SimplifiedHtmlLayout doNotShowWholeLoggerName="true"  useLevelImage = "true"/>
             <Filters>
                 <ThresholdFilter onMatch="ACCEPT"  onMismatch="DENY"   level="all"/>
