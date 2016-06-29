@@ -49,7 +49,9 @@ public class Configuration {
 
 
         properties = new Properties();
-        List<InputStream> iss = FileSystemAndResourceUtils.getAllResources("classpath*:*.properties");
+        Map<String, Object> map = FileSystemAndResourceUtils.getAllResources("classpath*:*.properties");
+        List<InputStream> iss = (List<InputStream>)map.get("iss");
+        List<String> paths = (List<String>) map.get("paths");
         if (iss.size() == 0){
             warn.add("No .properties file is found, which is probably a problem.");
             return;
@@ -57,12 +59,13 @@ public class Configuration {
         info.add(iss.size() + " .properties found, loading all of them ...");
         for (int i = 0; i < iss.size(); i++) {
             InputStream is = iss.get(i);
+            String path = paths.get(i);
             try {
-                debug.add("Loading properties from " + is.toString());
+                debug.add("Loading properties from " + path);
                 properties.load(iss.get(i));
-                info.add("Successfully load properties from " + is.toString());
+                info.add("Successfully load properties from " + path);
             } catch (IOException e) {
-                warn.add("Cannot load properties from " + is.toString());
+                warn.add("Cannot load properties from " + path);
             }
         }
         info.add("Attaching the loaded properties to System Properties ...");

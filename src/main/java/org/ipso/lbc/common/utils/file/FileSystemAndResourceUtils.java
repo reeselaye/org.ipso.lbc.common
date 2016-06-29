@@ -12,8 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Beicun Li (John Resse, iPso), 2016/01/09 21:26. Contact mister.resse@outlook.com.<br>
@@ -39,20 +41,25 @@ public class FileSystemAndResourceUtils {
         }
     }
 
-    public static List<InputStream> getAllResources(String urlPattern) {
+    public static Map<String, Object> getAllResources(String urlPattern) {
         Resource[] resources;
+        Map<String, Object> rtn = new HashMap<String, Object>();
         List<InputStream> iss = new LinkedList<InputStream>();
+        List<String> paths = new LinkedList<String>();
         try {
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             resources = resolver.getResources(urlPattern);
             for (Resource r : resources) {
                 iss.add(r.getInputStream());
+                paths.add(r.getURL().getPath());
             }
 
         } catch (IOException e) {
             throw new AppUnCheckException(e);
         }
-        return iss;
+        rtn.put("iss", iss);
+        rtn.put("paths", paths);
+        return rtn;
     }
 
     public static void closeAll(List<InputStream> iss) {
