@@ -72,8 +72,10 @@ public class Configuration {
         String kvs="";
         Object[] keys = getAllGatheredProperties().stringPropertyNames().toArray();
         for (int i = 0; i < keys.length; i++) {
-            Object key = keys[i];
-            kvs += key + " - " + getAllGatheredProperties().getProperty(key.toString()) +"\n";
+            String key = keys[i].toString();
+            Boolean match = keyMatchesMyMark(key);
+            String left = match?"{":"", right=match?"}":"";
+            kvs += left + key + " - " + getAllGatheredProperties().getProperty(key) + right + "\n";
         }
         debug.add("The following properties is loaded:\n" + kvs);
 
@@ -94,5 +96,14 @@ public class Configuration {
 
     private Properties getAllGatheredProperties(){
         return System.getProperties();
+    }
+
+    private Boolean keyMatchesMyMark(String key){
+        Boolean r = (key.startsWith("org.ipso.lbc")
+                || key.startsWith("org.resse")
+                || key.startsWith("app")
+                );
+
+        return r;
     }
 }
