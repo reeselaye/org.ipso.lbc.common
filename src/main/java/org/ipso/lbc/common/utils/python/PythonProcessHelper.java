@@ -14,8 +14,13 @@ public class PythonProcessHelper {
     public PythonProcessHelper() {
     }
     private PrintStream printStream;
+    private String printStrings;
     private String scriptPath;
     private String paramString="";
+
+    public String getPrintStrings() {
+        return printStrings;
+    }
 
     public void setPrintStream(PrintStream printStream) {
         this.printStream = printStream;
@@ -59,7 +64,7 @@ public class PythonProcessHelper {
             }
         }, ms);
 
-        String printStrings = "";
+        printStrings = "";
         try {
             Boolean cannotInvokeCmd;//indicate that whether the target command line cannot be invoke
             Boolean pythonProcessError;//if the python script prints 'ERROR', set true
