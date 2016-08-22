@@ -68,9 +68,7 @@ public class PythonProcessHelper {
         try {
             Boolean cannotInvokeCmd;//indicate that whether the target command line cannot be invoke
             Boolean pythonProcessError;//if the python script prints 'ERROR', set true
-            String cmd="python " + scriptPath+paramString;
-
-            pr = Runtime.getRuntime().exec(cmd);
+            pr = Runtime.getRuntime().exec(getCommandLine());
             BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
             String line;
             while (true) {
@@ -93,10 +91,10 @@ public class PythonProcessHelper {
             cannotInvokeCmd = printStrings.equals("");
 
             if (cannotInvokeCmd){
-                throw new CmdInvokeFailedException("Failed to invoke command line: "+cmd+".");
+                throw new CmdInvokeFailedException("Failed to invoke command line: "+getCommandLine()+".");
             }
             if (pythonProcessError){
-                throw new CrossInvokeErrorException("ERROR occurs when executing python script "+scriptPath+" .\nStdOut:\n"+printStrings);
+                throw new CrossInvokeErrorException("ERROR occurs when executing command line: "+getCommandLine()+".");
             }
             success(printStrings);
 
