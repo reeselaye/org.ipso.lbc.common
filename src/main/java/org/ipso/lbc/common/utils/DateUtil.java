@@ -6,10 +6,15 @@
 
 package org.ipso.lbc.common.utils;
 
+import org.ipso.lbc.common.exception.AppUnCheckException;
+
 import java.sql.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * 李倍存 创建于 2015/2/19 20:20。电邮 1174751315@qq.com。
@@ -75,6 +80,25 @@ public class DateUtil {
     }
     public static String getISOFormat(java.util.Date date){
         return new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(date);
+    }
+    public static List<String> getDateStringsBetween(String start, String end){
+        List<String> dates = new ArrayList<String>();
+        String f = new String(start), l = new String(end);
+        dates.add(f);
+        while (!f.equals(l)){
+            f = getDateStringAfter(f, 1);
+            dates.add(f);
+        }
+        return dates;
+    }
+    public static java.util.Date getDate(String dateString){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+        try {
+            return format.parse(dateString);
+        } catch (ParseException e){
+            throw new AppUnCheckException(e);
+        }
+
     }
     private static Calendar initCalendar(Date date){
         Calendar calendar=new GregorianCalendar();
