@@ -66,7 +66,7 @@ public class PythonProcessHelper {
 
         printStrings = "";
         try {
-            Boolean cannotInvokeCmd;//indicate that whether the target command line cannot be invoke
+            Boolean nothingPrinted;//indicate that whether the target command line cannot be invoke
             Boolean pythonProcessError;//if the python script prints 'ERROR', set true
             pr = Runtime.getRuntime().exec(getCommandLine());
             BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
@@ -88,21 +88,21 @@ public class PythonProcessHelper {
             pr.waitFor();
             pythonProcessError = printStrings.toUpperCase().matches("(.*)ERR(.*)");
 
-            cannotInvokeCmd = printStrings.equals("");
+            nothingPrinted = printStrings.equals("");
 
-            if (cannotInvokeCmd){
-                throw new CmdInvokeFailedException("Failed to invoke command line: "+getCommandLine()+".");
+            if (nothingPrinted){
+                throw new CmdInvokeFailedException("Perhaps failed to invoke command line: "+getCommandLine()+", because [nothing is printed].");
             }
             if (pythonProcessError){
                 throw new CrossInvokeErrorException("ERROR occurs when executing command line: "+getCommandLine()+".");
             }
-            success(printStrings);
+            whenSuccess(printStrings);
 
         } catch (IOException e) {
-            failed(printStrings);
+            whenFailed(printStrings);
             throw new CmdInvokeFailedException(e);
         } catch (InterruptedException e) {
-            failed(printStrings);
+            whenFailed(printStrings);
             throw new CmdInvokeFailedException(e);
         }
     }
@@ -110,16 +110,10 @@ public class PythonProcessHelper {
 
 
 
-    private void success(String str){
-        if (printStream==null) {
-            printStream = System.out;
-        }
-        printStream.println(str);
+    private void whenSuccess(String str){
+        // DO NOTHING
     }
-    private void failed(String str){
-        if (printStream==null) {
-            printStream = System.err;
-        }
-        printStream.println(str);
+    private void whenFailed(String str){
+        // DO NOTING
     }
 }
