@@ -1,6 +1,29 @@
-.gradle/
-ui/
-build/
-gradle-app.setting
+# gradle - vscode build files
+.classpath
+.project
+.settings/
 
-.idea/
+# Gradle files
+.gradle/
+build/
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Log Files
+*.log
+
+# Intellij
+# uncomment lines below to ignore idea project settings
+# *.iml
+# .idea/
+.idea/workspace.xml
+.idea/vcs.xml
+
+# Visual studio code
+.vscode/
