@@ -8,6 +8,7 @@
 package org.ipso.lbc.common.ado;
 
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * Created by LBC on 2015/2/13.
@@ -33,6 +34,14 @@ public class ConvertUtils {
         ElementPrintableLinkedList<T> dest = new ElementPrintableLinkedList<T>(name);
         for (int i = 0; i < list.size(); i++) {
             dest.add(list.get(i));
+        }
+        return dest;
+    }
+
+    public static <T> List<T> arrayToList(T[] array) {
+        List<T> dest = new LinkedList<T>();
+        for (int i = 0; i < array.length; i++) {
+            dest.add(array[i]);
         }
         return dest;
     }
