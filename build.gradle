@@ -1,50 +1,29 @@
-/*
- * 版权所有 (c) 2015 。 李倍存 （iPso）。
- * 所有者对该文件所包含的代码的正确性、执行效率等任何方面不作任何保证。
- * 所有个人和组织均可不受约束地将该文件所包含的代码用于非商业用途。若需要将其用于商业软件的开发，请首先联系所有者以取得许可。
- */
-
 apply plugin:'java'
 apply plugin:'maven-publish'
-    compileJava.options.encoding  = 'UTF-8'
-    compileTestJava.options.encoding  = 'UTF-8'
-    repositories{
-        maven  {
-            url "http://repo1.maven.org/maven2"
-        }
-        mavenLocal()
-   }
 
+compileJava.options.encoding  = 'UTF-8'
+compileTestJava.options.encoding  = 'UTF-8'
+
+repositories{
+    jcenter()
+    maven  {
+        url "http://repo1.maven.org/maven2"
+    }
+    mavenCentral()
+    mavenLocal()
+}
 
 task unittest(type: Test){
     dependsOn testClasses
     exclude('**/*IntegrationTest.class')
 }
-test{
-    doFirst{
-        println 'CLASSPATH:'
-        sourceSets.test.runtimeClasspath.each{cp ->
-            println cp
-        }
-    }
-}
 
-task prepareIntegrationTest(type: Copy){
-    from('src/cache'){
-        include '**/*.*'
-    }
-    into('build/idea-out/test/common/cache/')
-}
-test{
-    dependsOn prepareIntegrationTest
-}
 task runtimeJars(type:Copy){
     from configurations.runtime
     from configurations.testRuntime
-    into 'build/libs-gathered/'
-    dependsOn compileJava
-    dependsOn compileTestJava
+    into 'build/libs/'
 }
+
 jar{
     baseName = 'common'
     version = '1.0.4-beta'
@@ -53,6 +32,7 @@ jar{
         include '**/*.py'
     }
 }
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -68,41 +48,22 @@ publishing {
 }
 
 dependencies{
-    testCompile('junit:junit:4.12')
-    testCompile('org.dbunit:dbunit:2.2'){
-        exclude group:'poi'
-        exclude group:'commons-lang'
-        exclude group:'commons-logging'
-    }
-    compile('org.dbunit:dbunit:2.2'){
-        exclude group:'poi'
-        exclude group:'commons-lang'
-        exclude group:'commons-logging'
-    }
-    testCompile('org.mockito:mockito-core:1.10.19')
-
-    compile('commons-dbutils:commons-dbutils:1.6')
-
+    // aspect oriented
+    compile('org.aspectj:aspectjtools:1.8.5')
+    compile('org.aspectj:aspectjweaver:1.8.5')
+    compile('org.aspectj:aspectjrt:1.8.5')
+    compile('org.aspectj:aspectjlib:1.6.2')
+    // web
+    compile('javax.servlet:javax.servlet-api:3.1.0')
+    compile('javax.servlet:jstl:1.2')
     compile('org.apache.shiro:shiro-all:1.2.3')
-       compile('org.apache.struts:struts2-core:2.3.20'){
+    compile('org.apache.struts:struts2-core:2.3.20'){
         exclude group:'javassist'
         exclude group:'org.ow2.asm'
     }
     compile('org.apache.struts:struts2-json-plugin:2.3.20')
     compile('org.apache.struts:struts2-jfreechart-plugin:2.3.20')
-
-
-    compile('org.apache.ant:ant:1.9.4')
-
-    compile('org.aspectj:aspectjtools:1.8.5')
-    compile('org.aspectj:aspectjweaver:1.8.5')
-    compile('org.aspectj:aspectjrt:1.8.5')
-    compile('org.aspectj:aspectjlib:1.6.2')
-
-    compile('javax.servlet:servlet-api:default')
-
-    compile('drivers:ucanaccess:2.0.9.4')
-
+    // data access and ORM
     compile('org.apache.poi:openxml4j:1.0-beta'){
         exclude group:'log4j'
     }
@@ -113,8 +74,10 @@ dependencies{
     compile('poi:poi-scratchpad:3.1-FINAL'){
         exclude group:'log4j'
     }
-
     compile('org.hibernate:hibernate-core:4.3.8.Final')
+    compile('commons-dbutils:commons-dbutils:1.6')
+    compile('jfreechart:jfreechart:1.0.0')
+    // logging
     compile('org.apache.logging.log4j:log4j-api:2.3')
     compile('org.apache.logging.log4j:log4j-core:2.3')
     compile('org.apache.logging.log4j:log4j-web:2.3')
@@ -123,10 +86,7 @@ dependencies{
     compile('org.apache.logging.log4j:log4j-jul:2.3')
     compile('org.apache.logging.log4j:log4j-taglib:2.3')
     compile('org.apache.logging.log4j:log4j-jcl:2.3')
-    compile('drivers:oracle:6.0')
-
-    compile('javax.mail:mail:1.4.1')
-
+    // spring framework
     compile('org.springframework:spring-core:3.1.1.RELEASE')
     compile('org.springframework:spring-context:3.1.1.RELEASE')
     compile('org.springframework:spring-beans:3.1.1.RELEASE')
@@ -135,14 +95,18 @@ dependencies{
     compile('org.springframework:spring-tx:3.1.1.RELEASE')
     compile('org.springframework:spring-web:3.1.1.RELEASE')
     compile('org.springframework:spring-webmvc:3.1.1.RELEASE')
+    // mailing
+    compile('javax.mail:mail:1.4.1')
+	// misc
+	compile('org.apache.ant:ant:1.9.4')
+    // local libs
+    compile fileTree(dir: 'libs', include: '*.jar')
 
-    compile('jfreechart:jfreechart:1.0.0')
+    testCompile('junit:junit:4.12')
+    testCompile('org.dbunit:dbunit:2.2'){
+        exclude group:'poi'
+        exclude group:'commons-lang'
+        exclude group:'commons-logging'
+    }
+    testCompile('org.mockito:mockito-core:1.10.19')
 }
-
-
-
-
-
-
-
-
