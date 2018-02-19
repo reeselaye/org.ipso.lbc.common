@@ -15,7 +15,7 @@ import org.ipso.lbc.common.db.dao.SuperDAO;
  */
 public class DAORole extends AbstractDAO {
     public DAORole(SuperDAO superDAO) {
-        this.superDAO=superDAO;
+        super(superDAO);
     }
 
     public void insert(Role role){

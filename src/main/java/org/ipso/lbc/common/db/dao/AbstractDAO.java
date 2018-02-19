@@ -16,6 +16,10 @@ public class AbstractDAO {
 
     protected SuperDAO superDAO;
 
+    public AbstractDAO(SuperDAO root) {
+        this.superDAO = root;
+    }
+
     public SessionFactory getDefaultSessionFactory(){
         return superDAO.getSessionFactory();
     }

@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class DAOUser extends AbstractDAO {
     public DAOUser(SuperDAO superDAO) {
-        this.superDAO=superDAO;
+        super(superDAO);
     }
 
 
