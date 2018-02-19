@@ -83,7 +83,7 @@ public abstract class ServerBasedDatabaseSuperDAOConfigurationBuilder {
 
         superDAOConfiguration.setUserName(username);
         superDAOConfiguration.setPassword(password);
-        superDAOConfiguration.setUrl("jdbc:" + jdbcDriverId + "://" + host + ":" + port + "/" + databaseName);
+        superDAOConfiguration.setUrl("jdbc:" + jdbcDriverId + "://" + host + ":" + port + getDatabaseNamePartInUrl(databaseName));
 
         return superDAOConfiguration;
     }
@@ -102,6 +102,10 @@ public abstract class ServerBasedDatabaseSuperDAOConfigurationBuilder {
 
     protected String getDefaultDatabaseName() {
         throw new ConfigurationException("database.name must be explicitly provided.");
+    }
+
+    protected String getDatabaseNamePartInUrl(String databaseName) {
+        return "/" + databaseName;
     }
 
     private void update() {
