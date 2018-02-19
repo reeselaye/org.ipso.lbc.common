@@ -108,6 +108,14 @@ public abstract class ServerBasedDatabaseSuperDAOConfigurationBuilder {
         return "/" + databaseName;
     }
 
+    protected String getDefaultUsername() {
+        return "";
+    }
+
+    protected String getDefaultPassword() {
+        return "123456";
+    }
+
     private void update() {
         Configuration conf = Configuration.INSTANCE;
         if (jdbcDriverId == null) {
@@ -127,11 +135,11 @@ public abstract class ServerBasedDatabaseSuperDAOConfigurationBuilder {
         }
         username = conf.getConfiguration(getUsernameKey());
         if (username == null) {
-            username = "";
+            username = getDefaultUsername();
         }
         password = conf.getConfiguration(getPasswordKey());
         if (password == null) {
-            password = "";
+            password = getDefaultPassword();
         }
     }
 }

@@ -7,6 +7,16 @@ public class MySQLSuperDAOConfigurationBuilder extends ServerBasedDatabaseSuperD
     }
 
     @Override
+    protected String getDefaultDatabaseName() {
+        return "test";
+    }
+
+    @Override
+    protected String getDefaultUsername() {
+        return "root";
+    }
+
+    @Override
     protected String getDefaultJdbcDriverId() {
         return "mysql";
     }

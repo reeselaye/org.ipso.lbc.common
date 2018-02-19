@@ -15,4 +15,14 @@ public class SQLServerSuperDAOConfigurationBuilder extends ServerBasedDatabaseSu
     protected String getDatabaseNamePartInUrl(String databaseName) {
         return ";DatabaseName=" + databaseName;
     }
+
+    @Override
+    protected String getDefaultDatabaseName() {
+        return "tempdb";
+    }
+
+    @Override
+    protected String getDefaultUsername() {
+        return "sa";
+    }
 }
