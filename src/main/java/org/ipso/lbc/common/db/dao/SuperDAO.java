@@ -88,9 +88,14 @@ public class SuperDAO {
     public void insert(Object o) {
         Session session = defaultSession;
         Transaction t = session.beginTransaction();
-        session.clear();
-        session.save(o);
-        t.commit();
+        try {
+            session.clear();
+            session.save(o);
+            t.commit();
+        } catch (Exception e) {
+            t.rollback();
+            throw e;
+        }
     }
 
     /**
@@ -101,9 +106,14 @@ public class SuperDAO {
     public void insertOrUpdate(Object o) {
         Session session = defaultSession;
         Transaction t = session.beginTransaction();
-        session.clear();
-        session.saveOrUpdate(o);
-        t.commit();
+        try {
+            session.clear();
+            session.saveOrUpdate(o);
+            t.commit();
+        } catch (Exception e) {
+            t.rollback();
+            throw e;
+        }
     }
 
     /**
@@ -129,9 +139,14 @@ public class SuperDAO {
         List list = null;
         Session session = defaultSession;
         Transaction t = session.beginTransaction();
-        Query q = session.createQuery("from " + aClass.getName());
-        list = q.list();
-        t.commit();
+        try {
+            Query q = session.createQuery("from " + aClass.getName());
+            list = q.list();
+            t.commit();
+        } catch (Exception e) {
+            t.rollback();
+            throw e;
+        }
         return list;
     }
 
@@ -143,8 +158,13 @@ public class SuperDAO {
     public void update(Object o) {
         Session session = defaultSession;
         Transaction t = session.beginTransaction();
-        session.update(o);
-        t.commit();
+        try {
+            session.update(o);
+            t.commit();
+        } catch (Exception e) {
+            t.rollback();
+            throw e;
+        }
     }
 
     /**
@@ -155,9 +175,14 @@ public class SuperDAO {
     public void delete(Class aClass) {
         Session session = defaultSession;
         Transaction t = session.beginTransaction();
-        Query q = session.createQuery("delete " + aClass.getName());
-        q.executeUpdate();
-        t.commit();
+        try {
+            Query q = session.createQuery("delete " + aClass.getName());
+            q.executeUpdate();
+            t.commit();
+        } catch (Exception e) {
+            t.rollback();
+            throw e;
+        }
     }
 
     /**
@@ -169,8 +194,13 @@ public class SuperDAO {
     public void delete(Class aClass, Serializable pk) {
         Session session = defaultSession;
         Transaction t = session.beginTransaction();
-        session.delete(query(aClass, pk));
-        t.commit();
+        try {
+            session.delete(query(aClass, pk));
+            t.commit();
+        } catch (Exception e) {
+            t.rollback();
+            throw e;
+        }
     }
 
 
@@ -200,10 +230,15 @@ public class SuperDAO {
     public void sqlExecuteUpdate(String sql, Object... params) {
         Session defaultSession = this.getSession();
         Transaction t = defaultSession.beginTransaction();
-        SQLQuery query = defaultSession.createSQLQuery(sql);
-        this.attachParameters(query, params);
-        query.executeUpdate();
-        t.commit();
+        try {
+            SQLQuery query = defaultSession.createSQLQuery(sql);
+            this.attachParameters(query, params);
+            query.executeUpdate();
+            t.commit();
+        } catch (Exception e) {
+            t.rollback();
+            throw e;
+        }
     }
 
     public List excuteQuery(String sql, Object... params) {
