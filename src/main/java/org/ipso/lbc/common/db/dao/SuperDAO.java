@@ -60,7 +60,7 @@ public class SuperDAO {
             superDAO = new SuperDAO(configuration);
             LoggingFacade.info("Successfully to create the SuperDAO instance{everything of database works fine}. [" + configuration.getConfiguration().toString() + "]");
         } catch (HibernateException e){
-            LoggingFacade.fatal("The application is terminated because we cannot access the specified database.");
+            LoggingFacade.fatal("The application is terminated because we cannot access the specified database.", e);
             System.exit(-1);
         }
 
