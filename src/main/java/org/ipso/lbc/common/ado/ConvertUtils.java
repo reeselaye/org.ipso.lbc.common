@@ -45,4 +45,12 @@ public class ConvertUtils {
         }
         return dest;
     }
+
+    public static <T> List<T> fromObjectList(List list) {
+        List<T> r = new LinkedList<>();
+        for (Object o: list) {
+            r.add((T) o);
+        }
+        return r;
+    }
 }
