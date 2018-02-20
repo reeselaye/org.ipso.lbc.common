@@ -86,7 +86,7 @@ public class SuperDAO {
      * @param o 将要插入的对象。
      */
     public void insert(Object o) {
-        Session session = defaultSession;
+        Session session = getSession();
         Transaction t = session.beginTransaction();
         try {
             session.clear();
@@ -104,7 +104,7 @@ public class SuperDAO {
      * @param o 将要插入或更新的对象。
      */
     public void insertOrUpdate(Object o) {
-        Session session = defaultSession;
+        Session session = getSession();
         Transaction t = session.beginTransaction();
         try {
             session.clear();
@@ -124,7 +124,7 @@ public class SuperDAO {
      * @return 主键所对应的数据表行所构成的对象图。
      */
     public Object query(Class aClass, Serializable pk) {
-        Session session = defaultSession;
+        Session session = getSession();
         Object o = session.get(aClass, pk);
         return o;
     }
@@ -137,7 +137,7 @@ public class SuperDAO {
      */
     public List query(Class aClass) {
         List list = null;
-        Session session = defaultSession;
+        Session session = getSession();
         Transaction t = session.beginTransaction();
         try {
             Query q = session.createQuery("from " + aClass.getName());
@@ -156,7 +156,7 @@ public class SuperDAO {
      * @param o 用于替换数据库原有对象的新对象。
      */
     public void update(Object o) {
-        Session session = defaultSession;
+        Session session = getSession();
         Transaction t = session.beginTransaction();
         try {
             session.update(o);
@@ -173,7 +173,7 @@ public class SuperDAO {
      * @param aClass 待删除对象的类型。
      */
     public void delete(Class aClass) {
-        Session session = defaultSession;
+        Session session = getSession();
         Transaction t = session.beginTransaction();
         try {
             Query q = session.createQuery("delete " + aClass.getName());
@@ -192,7 +192,7 @@ public class SuperDAO {
      * @param pk     待删除对象的主键。
      */
     public void delete(Class aClass, Serializable pk) {
-        Session session = defaultSession;
+        Session session = getSession();
         Transaction t = session.beginTransaction();
         try {
             session.delete(query(aClass, pk));
@@ -203,7 +203,11 @@ public class SuperDAO {
         }
     }
 
+    public List hqlQuery(String hql, Object... params) {
+        return hqlExecuteQuery(hql, params);
+    }
 
+    @Deprecated
     public List query(String hql, Object... params) {
         return hqlExecuteQuery(hql, params);
     }
@@ -215,23 +219,29 @@ public class SuperDAO {
      * @param params HQL位置参数表。
      * @return HQL检索结果。
      */
+    @Deprecated
     public List hqlExecuteQuery(String hql, Object... params) {
-        Session defaultSession = this.getSession();
-        Query q = defaultSession.createQuery(hql);
+        Session session = getSession();
+        Query q = session.createQuery(hql);
         this.attachParameters(q, params);
         return q.list();
     }
 
+    public void sqlUpdate(String sql, Object... params) {
+        sqlExecuteUpdate(sql, params);
+    }
 
+    @Deprecated
     public void excuteUpdate(String sql, Object... params) {
         sqlExecuteUpdate(sql, params);
     }
 
+    @Deprecated
     public void sqlExecuteUpdate(String sql, Object... params) {
-        Session defaultSession = this.getSession();
-        Transaction t = defaultSession.beginTransaction();
+        Session session = getSession();
+        Transaction t = session.beginTransaction();
         try {
-            SQLQuery query = defaultSession.createSQLQuery(sql);
+            SQLQuery query = session.createSQLQuery(sql);
             this.attachParameters(query, params);
             query.executeUpdate();
             t.commit();
@@ -241,13 +251,19 @@ public class SuperDAO {
         }
     }
 
+    public List sqlQuery(String sql, Object... params) {
+        return sqlExecuteQuery(sql, params);
+    }
+
+    @Deprecated
     public List excuteQuery(String sql, Object... params) {
         return sqlExecuteQuery(sql, params);
     }
 
+    @Deprecated
     public List sqlExecuteQuery(String sql, Object... params) {
-        Session defaultSession = this.getSession();
-        SQLQuery query = defaultSession.createSQLQuery(sql);
+        Session session = getSession();
+        SQLQuery query = session.createSQLQuery(sql);
         this.attachParameters(query, params);
         return query.list();
     }
