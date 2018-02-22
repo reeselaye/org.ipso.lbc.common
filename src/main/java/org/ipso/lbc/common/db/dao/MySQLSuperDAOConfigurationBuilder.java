@@ -17,6 +17,16 @@ public class MySQLSuperDAOConfigurationBuilder extends ServerBasedDatabaseSuperD
     }
 
     @Override
+    protected String getDefaultDriverClass() {
+        return "com.mysql.jdbc.Driver";
+    }
+
+    @Override
+    protected String getDefaultSqlDialect() {
+        return "org.hibernate.dialect.MySQLDialect";
+    }
+
+    @Override
     protected String getDefaultJdbcDriverId() {
         return "mysql";
     }

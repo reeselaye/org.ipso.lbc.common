@@ -25,4 +25,14 @@ public class SQLServerSuperDAOConfigurationBuilder extends ServerBasedDatabaseSu
     protected String getDefaultUsername() {
         return "sa";
     }
+
+    @Override
+    protected String getDefaultDriverClass() {
+        return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    }
+
+    @Override
+    protected String getDefaultSqlDialect() {
+        return "org.hibernate.dialect.SQLServer2012Dialect";
+    }
 }

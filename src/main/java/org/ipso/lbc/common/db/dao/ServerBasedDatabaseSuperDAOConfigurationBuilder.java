@@ -6,6 +6,7 @@ import org.ipso.lbc.common.utils.ResourcePathHelper;
 
 public abstract class ServerBasedDatabaseSuperDAOConfigurationBuilder {
     private String jdbcDriverId;
+    private String driverClass, sqlDialect;
     private String host, port, databaseName, username, password;
 
     private String hostKey;
@@ -84,6 +85,8 @@ public abstract class ServerBasedDatabaseSuperDAOConfigurationBuilder {
         superDAOConfiguration.setUserName(username);
         superDAOConfiguration.setPassword(password);
         superDAOConfiguration.setUrl("jdbc:" + jdbcDriverId + "://" + host + ":" + port + getDatabaseNamePartInUrl(databaseName));
+        superDAOConfiguration.setDriverClass(driverClass);
+        superDAOConfiguration.setDialect(sqlDialect);
 
         return superDAOConfiguration;
     }
@@ -116,10 +119,20 @@ public abstract class ServerBasedDatabaseSuperDAOConfigurationBuilder {
         return "123456";
     }
 
+    protected abstract String getDefaultDriverClass();
+
+    protected abstract String getDefaultSqlDialect();
+
     private void update() {
         Configuration conf = Configuration.INSTANCE;
         if (jdbcDriverId == null) {
             jdbcDriverId = getDefaultJdbcDriverId();
+        }
+        if (driverClass == null) {
+            driverClass = getDefaultDriverClass();
+        }
+        if (sqlDialect == null) {
+            sqlDialect = getDefaultSqlDialect();
         }
         host = conf.getConfiguration(getHostKey());
         if (host == null) {
