@@ -18,6 +18,7 @@
 package org.ipso.lbc.common.db.dao;
 
 import org.hibernate.*;
+import org.ipso.lbc.common.domain.AbstractDomain;
 import org.ipso.lbc.common.frameworks.logging.LoggingFacade;
 
 import java.io.Serializable;
@@ -92,6 +93,7 @@ public class SuperDAO {
             session.clear();
             session.save(o);
             t.commit();
+            attachSuperDAOToObjectIfNeeded(o);
         } catch (Exception e) {
             t.rollback();
             throw e;
@@ -110,6 +112,7 @@ public class SuperDAO {
             session.clear();
             session.saveOrUpdate(o);
             t.commit();
+            attachSuperDAOToObjectIfNeeded(o);
         } catch (Exception e) {
             t.rollback();
             throw e;
@@ -126,6 +129,7 @@ public class SuperDAO {
     public Object query(Class aClass, Serializable pk) {
         Session session = getSession();
         Object o = session.get(aClass, pk);
+        attachSuperDAOToObjectIfNeeded(o);
         return o;
     }
 
@@ -143,6 +147,7 @@ public class SuperDAO {
             Query q = session.createQuery("from " + aClass.getName());
             list = q.list();
             t.commit();
+            attachSuperDAOToObjectIfNeeded(list);
         } catch (Exception e) {
             t.rollback();
             throw e;
@@ -161,6 +166,7 @@ public class SuperDAO {
         try {
             session.update(o);
             t.commit();
+            attachSuperDAOToObjectIfNeeded(o);
         } catch (Exception e) {
             t.rollback();
             throw e;
@@ -186,6 +192,24 @@ public class SuperDAO {
     }
 
     /**
+     * 删除一个对象。
+     *
+     * @param o 待删除对象。
+     */
+    public void delete(Object o) {
+        Session session = getSession();
+        Transaction t = session.beginTransaction();
+        try {
+            session.delete(o);
+            t.commit();
+            attachSuperDAOToObjectIfNeeded(o);
+        } catch (Exception e) {
+            t.rollback();
+            throw e;
+        }
+    }
+
+    /**
      * 在数据库中删除一个对象。
      *
      * @param aClass 待删除对象的类型。
@@ -195,8 +219,10 @@ public class SuperDAO {
         Session session = getSession();
         Transaction t = session.beginTransaction();
         try {
-            session.delete(query(aClass, pk));
+            Object o = query(aClass, pk);
+            session.delete(o);
             t.commit();
+            attachSuperDAOToObjectIfNeeded(o);
         } catch (Exception e) {
             t.rollback();
             throw e;
@@ -224,7 +250,9 @@ public class SuperDAO {
         Session session = getSession();
         Query q = session.createQuery(hql);
         this.attachParameters(q, params);
-        return q.list();
+        List list = q.list();
+        attachSuperDAOToObjectIfNeeded(list);
+        return list;
     }
 
     public void sqlUpdate(String sql, Object... params) {
@@ -265,12 +293,26 @@ public class SuperDAO {
         Session session = getSession();
         SQLQuery query = session.createSQLQuery(sql);
         this.attachParameters(query, params);
-        return query.list();
+        List list = query.list();
+        attachSuperDAOToObjectIfNeeded(list);
+        return list;
     }
 
     private void attachParameters(Query query, Object... parameters) {
         for (int i = 0; i < parameters.length; i++) {
             query.setParameter(i, parameters[i]);
+        }
+    }
+
+    private void attachSuperDAOToObjectIfNeeded(List list) {
+        for (Object o: list) {
+            attachSuperDAOToObjectIfNeeded(o);
+        }
+    }
+
+    private void attachSuperDAOToObjectIfNeeded(Object o) {
+        if (o instanceof AbstractDomain) {
+            ((AbstractDomain)(o)).attachSuperDAO(this);
         }
     }
 }

@@ -23,4 +23,8 @@ public class AbstractDAO {
     public SessionFactory getDefaultSessionFactory(){
         return superDAO.getSessionFactory();
     }
+
+    protected SuperDAO getSuperDAO() {
+        return superDAO;
+    }
 }
