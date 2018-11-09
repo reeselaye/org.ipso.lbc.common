@@ -16,5 +16,8 @@ public class ConfigurationIntegrationTest {
         assertEquals("cfg1", cfg1);
         assertEquals("cfg2", cfg2);
         assertEquals("test",test);
+
+        String testChinese = cfg.getConfiguration("test.chinese");
+        assertEquals("测试中文", testChinese);
     }
 }

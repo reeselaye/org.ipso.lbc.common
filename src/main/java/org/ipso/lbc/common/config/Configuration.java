@@ -11,6 +11,8 @@ import org.ipso.lbc.common.utils.file.FileSystemAndResourceUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static org.ipso.lbc.common.frameworks.logging.LoggingFacade.*;
@@ -62,7 +64,7 @@ public class Configuration {
             String path = paths.get(i);
             try {
                 debug.add("Loading properties from " + path);
-                properties.load(iss.get(i));
+                properties.load(new InputStreamReader(iss.get(i), Charset.forName("UTF-8")));
                 info.add("Successfully load properties from " + path);
             } catch (IOException e) {
                 warn.add("Cannot load properties from " + path);
@@ -81,8 +83,6 @@ public class Configuration {
             kvs += left + key + " - " + getAllGatheredProperties().getProperty(key) + right + "\n";
         }
         debug.add("The following properties is loaded:\n" + kvs);
-
-
     }
 
     public String getConfigurationEnsureReturn(String name){

@@ -89,7 +89,7 @@ public class FileSystemAndResourceUtils {
         }
         String urlStr = url.toString();
         String classpath = StringUtils.removeFromHead(urlStr, "/", 1, true);
-        return classpath;
+        return wrapFileSystemPath(classpath);
     }
 
     /**
@@ -143,6 +143,13 @@ public class FileSystemAndResourceUtils {
                 LoggingFacade.info("The directory " + dir + " does not exists, and we create it automatically.");
             }
         }
+    }
+
+    private static String wrapFileSystemPath(String path) {
+        if (!path.contains(":") && !path.startsWith("/")) {
+            path = "/" + path;
+        }
+        return path;
     }
 
 }

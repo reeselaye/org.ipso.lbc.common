@@ -26,7 +26,7 @@ task runtimeJars(type:Copy){
 
 jar{
     baseName = 'common'
-    version = '1.0.4-beta'
+    version = '1.0.5'
     from('src/main/java/'){
         include '**/*.xml'
         include '**/*.py'
@@ -38,7 +38,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.ipso.lbc'
             artifactId 'common'
-            version '1.0.4-beta'
+            version '1.0.5'
             artifact jar
         }
     }
