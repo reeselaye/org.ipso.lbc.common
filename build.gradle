@@ -25,7 +25,7 @@ task runtimeJars(type:Copy){
 }
 
 jar{
-    baseName = 'common'
+    baseName = 'lbc-common'
     version = '1.0.5'
     from('src/main/java/'){
         include '**/*.xml'
